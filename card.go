@@ -5,4 +5,5 @@ type card interface {
 	getName() string
 	isInStartingDeck() bool
 	getElement() element
+	getFormattedName() string
 }

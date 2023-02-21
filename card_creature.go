@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type creatureCard struct {
 	cost         int
 	name         string
@@ -12,6 +14,10 @@ type creatureCard struct {
 
 func (cc *creatureCard) getName() string {
 	return cc.name
+}
+
+func (cc *creatureCard) getFormattedName() string {
+	return fmt.Sprintf("(%d) %-25s %d/%d", cc.cost, cc.name, cc.baseAtk, cc.baseDef)
 }
 
 func (cc *creatureCard) getCost() int {

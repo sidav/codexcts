@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type magicCard struct {
 	cost         int
 	name         string
@@ -9,6 +11,10 @@ type magicCard struct {
 
 func (mc *magicCard) getName() string {
 	return mc.name
+}
+
+func (mc *magicCard) getFormattedName() string {
+	return fmt.Sprintf("(%d) %-25s", mc.cost, mc.name)
 }
 
 func (mc *magicCard) getCost() int {
