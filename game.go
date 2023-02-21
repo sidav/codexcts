@@ -87,10 +87,10 @@ func (g *game) performCurrentPhase() {
 }
 
 func (g *game) applyTechPhase() {
-	for i, c := range g.currentPlayer.techToAddNextTurn {
+	for i, c := range g.currentPlayer.cardsToAddNextTurn {
 		if c != nil {
 			g.currentPlayer.discard.addToBottom(c)
-			g.currentPlayer.techToAddNextTurn[i] = nil
+			g.currentPlayer.cardsToAddNextTurn[i] = nil
 		}
 	}
 }

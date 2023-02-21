@@ -37,7 +37,7 @@ func (r *tcellRenderer) renderHeader() {
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 	cw.DrawRect(0, 0, r.w, 0)
 	cw.SetStyle(tcell.ColorYellow, tcell.ColorBlack)
-	cw.PutStringCenteredAt(fmt.Sprintf("PLAYER %d - %s phase", r.g.currentPlayerNumber, r.g.getCurrentPhaseName()), r.w/2, 0)
+	cw.PutStringCenteredAt(fmt.Sprintf(" PLAYER %d - %s phase ", r.g.currentPlayerNumber, r.g.getCurrentPhaseName()), r.w/2, 0)
 }
 
 func (r *tcellRenderer) renderEnemyField() {
@@ -51,6 +51,16 @@ func (r *tcellRenderer) renderEnemyField() {
 	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.enemy.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
 	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.enemy.gold), 0)
+
+	for _, b := range r.enemy.techBuildings {
+		if b != nil {
+			r.drawLineAndIncrementY(b.static.name, 0)
+		}
+	}
+	if r.enemy.addonBuilding != nil {
+		r.drawLineAndIncrementY(r.enemy.addonBuilding.static.name, 0)
+	}
+
 	r.renderPatrolZone(r.enemy, 2)
 }
 

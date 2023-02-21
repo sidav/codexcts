@@ -5,13 +5,17 @@ type player struct {
 	draw    cardStack
 	discard cardStack
 
-	patrolZone        [5]*unit
-	commandZone       [3]*heroCard
-	otherZone         []*unit
-	techToAddNextTurn [2]card
-	gold              int
-	workers           int
-	baseHealth        int
+	patrolZone         [5]*unit
+	commandZone        [3]*heroCard
+	otherZone          []*unit
+	cardsToAddNextTurn [2]card
+
+	gold    int
+	workers int
+
+	baseHealth    int
+	techBuildings [3]*building
+	addonBuilding *building
 }
 
 func (p *player) sortHand() {
