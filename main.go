@@ -16,14 +16,6 @@ func main() {
 
 	g := &game{}
 	g.initGame()
-	//for pn, p := range g.players {
-	//	fmt.Printf("Player %d:\n", pn+1)
-	//	fmt.Printf("Hand: \n")
-	//	for i := range p.hand {
-	//		fmt.Printf("  %s\n", p.hand[i].getFormattedName())
-	//	}
-	//}
-	//g.performCurrentPhase(g.players[0])
 	for g.currentPhase != 3 {
 		g.performCurrentPhase()
 		g.endCurrentPhase()

@@ -5,6 +5,7 @@ import "fmt"
 type magicCard struct {
 	cost         int
 	name         string
+	description  string
 	element      element
 	startingDeck bool
 }

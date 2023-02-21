@@ -53,7 +53,7 @@ func (r *tcellRenderer) renderHand() {
 		cardW = r.w / 5
 	}
 	for i, c := range r.activePlayer.hand {
-		r.renderCardShort(c, i*(cardW+1), r.h-shortMapH, cardW, shortMapH)
+		r.renderCardShort(c, i*(cardW), r.h-shortMapH, cardW, shortMapH)
 	}
 }
 
@@ -63,15 +63,22 @@ func (r *tcellRenderer) renderCardShort(c card, x, y, w, h int) {
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 	cw.PutString(fmt.Sprintf("$%d", c.getCost()), x+1, y+1)
 	cw.ResetStyle()
-	cw.PutTextInRect(c.getName(), x+3, y+1, w-6)
+	cw.PutTextInRect(" "+c.getName(), x+3, y+1, w-6)
 	elementAndTechLine := c.getElement().getName()
 	switch c.(type) {
 	case *magicCard:
-		{
-			elementAndTechLine += " Magic"
+		mc := c.(*magicCard)
+		elementAndTechLine += " Magic"
+		cw.SetFg(tcell.ColorGray)
+		cw.PutTextInRect(mc.description, x+1, y+2, w-2)
+		cw.ResetStyle()
+	case *unitCard:
+		cc := c.(*unitCard)
+		cw.SetFg(tcell.ColorGray)
+		for i := range cc.specials {
+			cw.PutStringCenteredAt(cc.specials[i].getFormattedName(), x+w/2, y+3+i)
 		}
-	case *creatureCard:
-		cc := c.(*creatureCard)
+		cw.ResetStyle()
 		elementAndTechLine += fmt.Sprintf(" Tech %d", cc.techLevel)
 		cw.PutStringPaddedToRight(fmt.Sprintf("%d/%d", cc.baseAtk, cc.baseDef), x+w, y+h-1)
 	}

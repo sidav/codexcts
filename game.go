@@ -1,10 +1,11 @@
 package main
 
 type game struct {
-	players            [2]*player
-	currentPlayersTurn int
-	currentTurn        int
-	currentPhase       int
+	players             [2]*player
+	currentPlayer       *player
+	currentPlayerNumber int
+	currentTurn         int
+	currentPhase        int
 }
 
 func (g *game) initGame() {
@@ -31,7 +32,8 @@ func (g *game) initGame() {
 	}
 	g.players[1].workers = 5
 	g.currentTurn = 1
-	g.currentPlayersTurn = 0
+	g.currentPlayer = g.players[0]
+	g.currentPlayerNumber = 0
 	g.currentPhase = 0
 }
 
@@ -39,15 +41,22 @@ func (g *game) endCurrentPhase() {
 	g.currentPhase++
 	if g.currentPhase > 5 {
 		g.currentPhase = 0
-		g.currentPlayersTurn = (g.currentPlayersTurn + 1) % 2
-		g.currentTurn++
+		g.currentPlayerNumber = (g.currentPlayerNumber + 1) % 2
+		g.currentPlayer = g.players[g.currentPlayerNumber]
+		if g.currentPlayerNumber == 0 {
+			g.currentTurn++
+		}
 	}
 }
 
 func (g *game) performCurrentPhase() {
 	switch g.currentPhase {
 	// Phase 0: Apply tech
+	case 0:
+		g.applyTechPhase()
 	// Phase 1: Untap
+	case 1:
+		g.untapPhase()
 	// Phase 2: Upkeep
 	case 2:
 		g.upkeepPhase()
@@ -59,12 +68,34 @@ func (g *game) performCurrentPhase() {
 	}
 }
 
+func (g *game) applyTechPhase() {
+	for i, c := range g.currentPlayer.techToAddNextTurn {
+		if c != nil {
+			g.currentPlayer.discard.addToBottom(c)
+			g.currentPlayer.techToAddNextTurn[i] = nil
+		}
+	}
+}
+
+func (g *game) untapPhase() {
+	for _, u := range g.currentPlayer.patrolZone {
+		if u != nil {
+			u.tapped = false
+		}
+	}
+	for _, u := range g.currentPlayer.otherZone {
+		if u != nil {
+			u.tapped = false
+		}
+	}
+}
+
 func (g *game) upkeepPhase() {
-	g.players[g.currentPlayersTurn].gold += g.players[g.currentPlayersTurn].workers
+	g.players[g.currentPlayerNumber].gold += g.players[g.currentPlayerNumber].workers
 }
 
 func (g *game) discardPhase() {
-	p := g.players[g.currentPlayersTurn]
+	p := g.players[g.currentPlayerNumber]
 	cardsToDraw := len(p.hand) + 2
 	if cardsToDraw >= 5 {
 		cardsToDraw = 5

@@ -37,11 +37,11 @@ func (s *cardStack) sortByName() {
 func (s *cardStack) sortByType() {
 	sort.Slice(*s, func(i, j int) bool {
 		switch (*s)[i].(type) {
-		case *creatureCard:
+		case *unitCard:
 			return true
 		case *magicCard:
 			switch (*s)[j].(type) {
-			case *creatureCard:
+			case *unitCard:
 				return false
 			case *magicCard:
 				return true
