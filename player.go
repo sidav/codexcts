@@ -5,11 +5,11 @@ type player struct {
 	draw    cardStack
 	discard cardStack
 
-	// patrolZone [5]creature
-	// heroes  [3]*heroes need a separate type
-	gold       int
-	workers    int
-	baseHealth int
+	patrolZone  [5]*creature
+	commandZone [3]*heroCard
+	gold        int
+	workers     int
+	baseHealth  int
 }
 
 func (p *player) sortHand() {
