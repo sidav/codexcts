@@ -2,7 +2,6 @@ package main
 
 import (
 	"codexcts/lib/random"
-	"fmt"
 	"sort"
 )
 
@@ -17,14 +16,39 @@ func (s *cardStack) addToBottom(c card) {
 }
 
 func (s *cardStack) pop() card {
-	fmt.Printf("DEBUG: %d\n", len(*s))
+	// fmt.Printf("DEBUG: %d\n", len(*s))
 	c := (*s)[0]
 	*s = (*s)[1:]
 	return c
 }
 
+func (s *cardStack) moveFrom(s2 *cardStack) {
+	s.addToBottom(s2.pop())
+}
+
 func (s *cardStack) sortByCost() {
 	sort.Slice(*s, func(i, j int) bool { return (*s)[i].getCost() < (*s)[j].getCost() })
+}
+
+func (s *cardStack) sortByName() {
+	sort.Slice(*s, func(i, j int) bool { return (*s)[i].getName()[0] < (*s)[j].getName()[0] })
+}
+
+func (s *cardStack) sortByType() {
+	sort.Slice(*s, func(i, j int) bool {
+		switch (*s)[i].(type) {
+		case *creatureCard:
+			return true
+		case *magicCard:
+			switch (*s)[j].(type) {
+			case *creatureCard:
+				return false
+			case *magicCard:
+				return true
+			}
+		}
+		return false
+	})
 }
 
 func (s cardStack) shuffle(rnd random.PRNG) {

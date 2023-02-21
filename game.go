@@ -1,10 +1,13 @@
 package main
 
 type game struct {
-	players [2]player
+	players [2]*player
 }
 
 func (g *game) initGame() {
+	g.players[0] = &player{}
+	g.players[1] = &player{}
+
 	for i := range g.players {
 		// fmt.Println("Player ", i)
 		g.players[i].workers = 4
@@ -24,4 +27,32 @@ func (g *game) initGame() {
 		g.players[i].sortHand()
 	}
 	g.players[1].workers = 5
+}
+
+func (g *game) makeTurnAsPlayer(p *player) {
+	// Phase 0: Apply tech
+	// Phase 1: Untap
+	// Phase 2: Upkeep
+	// Phase 3: Main
+	// Phase 4: Discard
+	g.discardPhase(p)
+	// Phase 5: Select tech
+}
+
+func (g *game) discardPhase(p *player) {
+	cardsToDraw := len(p.hand) + 2
+	if cardsToDraw >= 5 {
+		cardsToDraw = 5
+	}
+	p.discardHand()
+	for i := 0; i < cardsToDraw; i++ {
+		if len(p.draw) == 0 {
+			if len(p.discard) == 0 {
+				break
+			}
+			p.addDiscardIntoDraw()
+			p.shuffleDraw()
+		}
+		p.drawCard()
+	}
 }

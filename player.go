@@ -4,17 +4,35 @@ type player struct {
 	hand    cardStack
 	draw    cardStack
 	discard cardStack
-	// heroes  [3]*card need a separate type
+
+	// patrolZone [5]creature
+	// heroes  [3]*heroes need a separate type
 	gold       int
 	workers    int
 	baseHealth int
 }
 
 func (p *player) sortHand() {
+	p.hand.sortByName()
 	p.hand.sortByCost()
 }
 
 func (p *player) drawCard() {
-	poppedCard := p.draw.pop()
-	p.hand.pushOnTop(poppedCard)
+	p.hand.moveFrom(&p.draw)
+}
+
+func (p *player) discardHand() {
+	for len(p.hand) > 0 {
+		p.discard.moveFrom(&p.hand)
+	}
+}
+
+func (p *player) shuffleDraw() {
+	p.draw.shuffle(rnd)
+}
+
+func (p *player) addDiscardIntoDraw() {
+	for len(p.discard) > 0 {
+		p.draw.moveFrom(&p.discard)
+	}
 }
