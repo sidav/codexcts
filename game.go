@@ -96,6 +96,7 @@ func (g *game) applyTechPhase() {
 }
 
 func (g *game) untapPhase() {
+	g.currentPlayer.hiredWorkerThisTurn = false
 	for _, u := range g.currentPlayer.patrolZone {
 		if u != nil {
 			u.tapped = false

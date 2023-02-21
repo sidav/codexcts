@@ -10,8 +10,9 @@ type player struct {
 	otherZone          []*unit
 	cardsToAddNextTurn [2]card
 
-	gold    int
-	workers int
+	gold                int
+	workers             int
+	hiredWorkerThisTurn bool
 
 	baseHealth    int
 	techBuildings [3]*building

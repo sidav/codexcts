@@ -8,7 +8,7 @@ type unitCard struct {
 	element      element
 	techLevel    int
 	baseAtk      int
-	baseDef      int
+	baseHP       int
 	specials     []unitSpecial
 	startingDeck bool
 }
@@ -18,7 +18,7 @@ func (uc *unitCard) getName() string {
 }
 
 func (uc *unitCard) getFormattedName() string {
-	return fmt.Sprintf("(%d) %-25s %d/%d", uc.cost, uc.name, uc.baseAtk, uc.baseDef)
+	return fmt.Sprintf("(%d) %-25s %d/%d", uc.cost, uc.name, uc.baseAtk, uc.baseHP)
 }
 
 func (uc *unitCard) getCost() int {

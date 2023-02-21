@@ -7,6 +7,16 @@ import (
 
 type cardStack []card
 
+func (s *cardStack) removeThis(c card) {
+	for i := range *s {
+		if (*s)[i] == c {
+			*s = append((*s)[:i], (*s)[i+1:]...)
+			return
+		}
+	}
+	panic("No card " + c.getName() + "in stack!")
+}
+
 func (s *cardStack) pushOnTop(c card) {
 	*s = append([]card{c}, *s...)
 }

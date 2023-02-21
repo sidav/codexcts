@@ -8,7 +8,9 @@ import (
 const (
 	patrolZoneW = 70
 	patrolZoneH = 10
-	cardInHandH = 8
+	cardShortH  = 8
+	cardFullW   = 30
+	cardFullH   = 20
 )
 
 type tcellRenderer struct {
@@ -17,9 +19,10 @@ type tcellRenderer struct {
 	g            *game
 	activePlayer *player
 	enemy        *player
+	pc           *playerController
 }
 
-func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum, currentPhase int) {
+func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerController) {
 	r.g = g
 	r.activePlayer = g.players[renderForPlayerNum]
 	r.enemy = g.players[(renderForPlayerNum+1)%2]
@@ -29,6 +32,13 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum, currentPhase int
 	r.renderHeader()
 	r.renderEnemyField()
 	r.renderPlayerField()
+	if pc.currentMode == PCMODE_CARD_FROM_HAND_SELECTED {
+		r.renderCardFull(pc.currentSelectedCardFromHand, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
+		r.currUiLine = r.h/2 + cardFullH/2 + 1
+		r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "W - spend as worker"), r.w/2-cardFullW/2)
+		r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "P - play card"), r.w/2-cardFullW/2)
+	}
 
 	cw.FlushScreen()
 }
@@ -74,7 +84,7 @@ func (r *tcellRenderer) renderPlayerField() {
 	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
 	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.activePlayer.gold), 0)
-	r.renderPatrolZone(r.activePlayer, r.h-cardInHandH-patrolZoneH-2)
+	r.renderPatrolZone(r.activePlayer, r.h-cardShortH-patrolZoneH-2)
 	r.renderHand()
 }
 
@@ -85,7 +95,7 @@ func (r *tcellRenderer) renderHand() {
 		cardW = r.w / 5
 	}
 	for i, c := range r.activePlayer.hand {
-		r.renderCardShort(c, i*(cardW), r.h-cardInHandH, cardW, cardInHandH)
+		r.renderCardShort(c, i*(cardW), r.h-cardShortH, cardW, cardShortH)
 	}
 }
 
@@ -112,9 +122,40 @@ func (r *tcellRenderer) renderCardShort(c card, x, y, w, h int) {
 		}
 		cw.ResetStyle()
 		elementAndTechLine += fmt.Sprintf(" Tech %d", cc.techLevel)
-		cw.PutStringPaddedToRight(fmt.Sprintf("%d/%d", cc.baseAtk, cc.baseDef), x+w, y+h-1)
+		cw.PutStringPaddedToRight(fmt.Sprintf("%d/%d", cc.baseAtk, cc.baseHP), x+w, y+h-2)
 	}
-	cw.PutString(elementAndTechLine, x+1, y+h-2)
+	cw.PutString(elementAndTechLine, x+1, y+h-1)
+}
+
+func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
+	cw.ResetStyle()
+	cw.DrawFilledRect(' ', x, y, w, h)
+	cw.SetStyle(tcell.ColorGray, tcell.ColorDarkGray)
+	cw.DrawRect(x, y, w, h)
+	cw.DrawRect(x, y, w, h/4)
+	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
+	cw.PutString(fmt.Sprintf(" $%d ", c.getCost()), x+1, y+1)
+	cw.ResetStyle()
+	cw.PutTextInRect(" "+c.getName(), x+3, y+2, w-6)
+	elementAndTechLine := c.getElement().getName()
+	switch c.(type) {
+	case *magicCard:
+		mc := c.(*magicCard)
+		elementAndTechLine += " Magic"
+		cw.SetFg(tcell.ColorGray)
+		cw.PutTextInRect(mc.description, x+1, y+h/4+3, w-2)
+		cw.ResetStyle()
+	case *unitCard:
+		cc := c.(*unitCard)
+		cw.SetFg(tcell.ColorGray)
+		for i := range cc.specials {
+			cw.PutStringCenteredAt(cc.specials[i].getFormattedName(), x+w/2, y+h/4+3+i)
+		}
+		cw.ResetStyle()
+		elementAndTechLine += fmt.Sprintf(" Tech %d", cc.techLevel)
+		cw.PutStringPaddedToRight(fmt.Sprintf("ATK %d HP %d", cc.baseAtk, cc.baseHP), x+w, y+h-1)
+	}
+	cw.PutString(elementAndTechLine, x+1, y+h-1)
 }
 
 func (r *tcellRenderer) renderPatrolZone(p *player, y int) {

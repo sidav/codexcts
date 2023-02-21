@@ -7,23 +7,22 @@ import (
 
 var (
 	rnd random.PRNG
+	pc  *playerController
 )
 
 func main() {
-	rnd = pcgrandom.New(-1)
 	onInit()
 	defer onClose()
 
+	rnd = pcgrandom.New(-1)
+
 	g := &game{}
 	g.initGame()
-	io.renderGame(g, 0, g.currentPhase)
-	key := ""
-	for key != "ESCAPE" {
-		g.performCurrentPhase()
-		io.renderGame(g, g.currentPlayerNumber, g.currentPhase)
-		if g.currentPhase == 3 && g.currentPlayerNumber == 0 {
-			key = readKey()
-		}
-		g.endCurrentPhase()
+	pc = &playerController{
+		controlsPlayer:              g.players[0],
+		currentMode:                 PCMODE_NONE,
+		currentSelectedCardFromHand: nil,
+		currentSelectedUnit:         nil,
 	}
+	gameLoop(g)
 }
