@@ -1,0 +1,60 @@
+package main
+
+var cardsDb = []cardStatic{
+	&creatureCard{
+		cost:      1,
+		name:      "Timely Messenger",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   1,
+		baseDef:   1,
+	},
+	&creatureCard{
+		cost:      1,
+		name:      "Tenderfoot",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   1,
+		baseDef:   2,
+	},
+	&creatureCard{
+		cost:      2,
+		name:      "Older Brother",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   2,
+		baseDef:   2,
+	},
+	&creatureCard{
+		cost:      2,
+		name:      "Brick Thief",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   2,
+		baseDef:   1,
+	},
+	&creatureCard{
+		cost:      2,
+		name:      "Helpful Turtle",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   1,
+		baseDef:   2,
+	},
+	&creatureCard{
+		cost:      3,
+		name:      "Granfalloon Flagbearer",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   2,
+		baseDef:   2,
+	},
+	&creatureCard{
+		cost:      3,
+		name:      "Fruit Ninja",
+		element:   ELEMENT_NEUTRAL,
+		techLevel: 0,
+		baseAtk:   2,
+		baseDef:   2,
+	},
+}
