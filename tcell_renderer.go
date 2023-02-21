@@ -5,6 +5,12 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+const (
+	patrolZoneW = 70
+	patrolZoneH = 10
+	cardInHandH = 8
+)
+
 type tcellRenderer struct {
 	w, h         int
 	g            *game
@@ -21,7 +27,6 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int) {
 
 	r.renderEnemyField()
 	r.renderPlayerField()
-	r.renderHand()
 
 	cw.FlushScreen()
 }
@@ -34,6 +39,7 @@ func (r *tcellRenderer) renderEnemyField() {
 	cw.PutString(fmt.Sprintf("WORKERS: %d", r.enemy.workers), 0, 0)
 	cw.SetFg(tcell.ColorYellow)
 	cw.PutString(fmt.Sprintf("$%d", r.enemy.gold), 0, 1)
+	r.renderPatrolZone(r.enemy, 4)
 }
 
 func (r *tcellRenderer) renderPlayerField() {
@@ -43,17 +49,18 @@ func (r *tcellRenderer) renderPlayerField() {
 	cw.PutString(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0, r.h/2+1)
 	cw.SetFg(tcell.ColorYellow)
 	cw.PutString(fmt.Sprintf("$%d", r.activePlayer.gold), 0, r.h/2)
+	r.renderPatrolZone(r.activePlayer, r.h-cardInHandH-patrolZoneH-2)
+	r.renderHand()
 }
 
 func (r *tcellRenderer) renderHand() {
-	shortMapH := 8
 	cards := len(r.activePlayer.hand)
 	cardW := r.w / cards
 	if cardW > r.w/5 {
 		cardW = r.w / 5
 	}
 	for i, c := range r.activePlayer.hand {
-		r.renderCardShort(c, i*(cardW), r.h-shortMapH, cardW, shortMapH)
+		r.renderCardShort(c, i*(cardW), r.h-cardInHandH, cardW, cardInHandH)
 	}
 }
 
@@ -83,4 +90,33 @@ func (r *tcellRenderer) renderCardShort(c card, x, y, w, h int) {
 		cw.PutStringPaddedToRight(fmt.Sprintf("%d/%d", cc.baseAtk, cc.baseDef), x+w, y+h-1)
 	}
 	cw.PutString(elementAndTechLine, x+1, y+h-2)
+}
+
+func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
+	x := r.w - patrolZoneW - 12
+	cw.ResetStyle()
+	cardW := patrolZoneW / 5
+	for i := 0; i < 5; i++ {
+		currX := x + i*cardW
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorGray)
+		cw.DrawRect(currX, y, cardW, patrolZoneH)
+		cw.SetStyle(tcell.ColorGray, tcell.ColorBlack)
+		switch i {
+		case 0:
+			cw.PutStringCenteredAt("Squad leader", currX+cardW/2, y+1)
+			cw.PutStringCenteredAt("+SHLD/Taunt", currX+cardW/2, y+patrolZoneH)
+		case 1:
+			cw.PutStringCenteredAt("Elite", currX+cardW/2, y+1)
+			cw.PutStringCenteredAt("+1 ATK", currX+cardW/2, y+patrolZoneH)
+		case 2:
+			cw.PutStringCenteredAt("Scavenger", x+i*cardW+cardW/2, y+1)
+			cw.PutStringCenteredAt("Dies: +1$", currX+cardW/2, y+patrolZoneH)
+		case 3:
+			cw.PutStringCenteredAt("Technician", x+i*cardW+cardW/2, y+1)
+			cw.PutStringCenteredAt("Dies: +1 Card", currX+cardW/2, y+patrolZoneH)
+		case 4:
+			cw.PutStringCenteredAt("Lookout", x+i*cardW+cardW/2, y+1)
+			cw.PutStringCenteredAt("Resist 1", currX+cardW/2, y+patrolZoneH)
+		}
+	}
 }
