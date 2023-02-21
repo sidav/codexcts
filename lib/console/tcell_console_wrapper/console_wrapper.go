@@ -59,6 +59,10 @@ func (c *ConsoleWrapper) PutStringCenteredAt(str string, x, y int) {
 	}
 }
 
+func (c *ConsoleWrapper) PutStringPaddedToRight(str string, x, y int) {
+	c.PutString(str, x-len(str), y)
+}
+
 func (c *ConsoleWrapper) SetFg(fg tcell.Color) {
 	c.style = c.style.Foreground(fg)
 }

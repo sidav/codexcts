@@ -1,7 +1,10 @@
 package main
 
 type game struct {
-	players [2]*player
+	players            [2]*player
+	currentPlayersTurn int
+	currentTurn        int
+	currentPhase       int
 }
 
 func (g *game) initGame() {
@@ -27,19 +30,41 @@ func (g *game) initGame() {
 		g.players[i].sortHand()
 	}
 	g.players[1].workers = 5
+	g.currentTurn = 1
+	g.currentPlayersTurn = 0
+	g.currentPhase = 0
 }
 
-func (g *game) makeTurnAsPlayer(p *player) {
+func (g *game) endCurrentPhase() {
+	g.currentPhase++
+	if g.currentPhase > 5 {
+		g.currentPhase = 0
+		g.currentPlayersTurn = (g.currentPlayersTurn + 1) % 2
+		g.currentTurn++
+	}
+}
+
+func (g *game) performCurrentPhase() {
+	switch g.currentPhase {
 	// Phase 0: Apply tech
 	// Phase 1: Untap
 	// Phase 2: Upkeep
+	case 2:
+		g.upkeepPhase()
 	// Phase 3: Main
 	// Phase 4: Discard
-	g.discardPhase(p)
-	// Phase 5: Select tech
+	case 4:
+		g.discardPhase()
+		// Phase 5: Select tech
+	}
 }
 
-func (g *game) discardPhase(p *player) {
+func (g *game) upkeepPhase() {
+	g.players[g.currentPlayersTurn].gold += g.players[g.currentPlayersTurn].workers
+}
+
+func (g *game) discardPhase() {
+	p := g.players[g.currentPlayersTurn]
 	cardsToDraw := len(p.hand) + 2
 	if cardsToDraw >= 5 {
 		cardsToDraw = 5
@@ -55,4 +80,5 @@ func (g *game) discardPhase(p *player) {
 		}
 		p.drawCard()
 	}
+	p.sortHand()
 }
