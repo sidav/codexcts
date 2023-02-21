@@ -37,6 +37,24 @@ func (g *game) initGame() {
 	g.currentPhase = 0
 }
 
+func (g *game) getCurrentPhaseName() string {
+	switch g.currentPhase {
+	case 0:
+		return "Apply tech"
+	case 1:
+		return "Ready"
+	case 2:
+		return "Upkeep"
+	case 3:
+		return "Main"
+	case 4:
+		return "Discard"
+	case 5:
+		return "Select tech"
+	}
+	panic("No phase name")
+}
+
 func (g *game) endCurrentPhase() {
 	g.currentPhase++
 	if g.currentPhase > 5 {

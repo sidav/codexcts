@@ -13,42 +13,57 @@ const (
 
 type tcellRenderer struct {
 	w, h         int
+	currUiLine   int
 	g            *game
 	activePlayer *player
 	enemy        *player
 }
 
-func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int) {
+func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum, currentPhase int) {
 	r.g = g
 	r.activePlayer = g.players[renderForPlayerNum]
 	r.enemy = g.players[(renderForPlayerNum+1)%2]
 	r.w, r.h = cw.GetConsoleSize()
 	cw.ClearScreen()
 
+	r.renderHeader()
 	r.renderEnemyField()
 	r.renderPlayerField()
 
 	cw.FlushScreen()
 }
 
+func (r *tcellRenderer) renderHeader() {
+	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
+	cw.DrawRect(0, 0, r.w, 0)
+	cw.SetStyle(tcell.ColorYellow, tcell.ColorBlack)
+	cw.PutStringCenteredAt(fmt.Sprintf("PLAYER %d - %s phase", r.g.currentPlayerNumber, r.g.getCurrentPhaseName()), r.w/2, 0)
+}
+
 func (r *tcellRenderer) renderEnemyField() {
+	r.currUiLine = 1
+	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
+	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.enemy.baseHealth), 0)
 	cw.ResetStyle()
-	cw.PutStringPaddedToRight(fmt.Sprintf("DRAW: %d", len(r.enemy.draw)), r.w, 0)
-	cw.PutStringPaddedToRight(fmt.Sprintf("DISCARD: %d", len(r.enemy.discard)), r.w, 1)
-	cw.PutStringCenteredAt(fmt.Sprintf("HAND: %d", len(r.enemy.hand)), r.w/2, 0)
-	cw.PutString(fmt.Sprintf("WORKERS: %d", r.enemy.workers), 0, 0)
+	r.drawLineAndIncrementY(fmt.Sprintf("HAND: %4d", len(r.enemy.hand)), 0)
+	r.drawLineAndIncrementY(fmt.Sprintf("DRAW: %4d", len(r.enemy.draw)), 0)
+	r.drawLineAndIncrementY(fmt.Sprintf("DISCARD: %d", len(r.enemy.discard)), 0)
+	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.enemy.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
-	cw.PutString(fmt.Sprintf("$%d", r.enemy.gold), 0, 1)
-	r.renderPatrolZone(r.enemy, 4)
+	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.enemy.gold), 0)
+	r.renderPatrolZone(r.enemy, 2)
 }
 
 func (r *tcellRenderer) renderPlayerField() {
+	r.currUiLine = r.h/2 + 1
+	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
+	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
 	cw.ResetStyle()
-	cw.PutStringPaddedToRight(fmt.Sprintf("DRAW: %d", len(r.activePlayer.draw)), r.w, r.h/2)
-	cw.PutStringPaddedToRight(fmt.Sprintf("DISCARD: %d", len(r.activePlayer.discard)), r.w, r.h/2+1)
-	cw.PutString(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0, r.h/2+1)
+	r.drawLineAndIncrementY(fmt.Sprintf("DRAW: %4d", len(r.activePlayer.draw)), 0)
+	r.drawLineAndIncrementY(fmt.Sprintf("DISCARD: %d", len(r.activePlayer.discard)), 0)
+	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
-	cw.PutString(fmt.Sprintf("$%d", r.activePlayer.gold), 0, r.h/2)
+	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.activePlayer.gold), 0)
 	r.renderPatrolZone(r.activePlayer, r.h-cardInHandH-patrolZoneH-2)
 	r.renderHand()
 }
@@ -119,4 +134,9 @@ func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 			cw.PutStringCenteredAt("Resist 1", currX+cardW/2, y+patrolZoneH)
 		}
 	}
+}
+
+func (r *tcellRenderer) drawLineAndIncrementY(line string, x int) {
+	cw.PutString(line, x, r.currUiLine)
+	r.currUiLine++
 }

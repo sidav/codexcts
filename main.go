@@ -16,10 +16,12 @@ func main() {
 
 	g := &game{}
 	g.initGame()
-	for g.currentPhase != 3 {
+	io.renderGame(g, 0, g.currentPhase)
+	key := readKey()
+	for key != "ESCAPE" {
 		g.performCurrentPhase()
+		io.renderGame(g, g.currentPlayerNumber, g.currentPhase)
+		key = readKey()
 		g.endCurrentPhase()
 	}
-	io.renderGame(g, 0)
-	readKey()
 }
