@@ -38,6 +38,10 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerCo
 	if pc.currentMode == PCMODE_UNIT_SELECTED {
 		r.renderSelectedUnit()
 	}
+	if pc.currentMode == PCMODE_MOVE_SELECTED_UNIT {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
+		r.drawInfoRect(fmt.Sprintf("Where to move %s?", pc.currentSelectedUnit.card.getName()), r.w/2, r.h-cardShortH)
+	}
 
 	cw.FlushScreen()
 }
@@ -46,7 +50,8 @@ func (r *tcellRenderer) renderHeader() {
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 	cw.DrawRect(0, 0, r.w, 0)
 	cw.SetStyle(tcell.ColorYellow, tcell.ColorBlack)
-	cw.PutStringCenteredAt(fmt.Sprintf(" PLAYER %d - %s phase ", r.g.currentPlayerNumber, r.g.getCurrentPhaseName()), r.w/2, 0)
+	cw.PutStringCenteredAt(fmt.Sprintf(" TURN %d: PLAYER %d - %s phase ",
+		r.g.currentTurn, r.g.currentPlayerNumber, r.g.getCurrentPhaseName()), r.w/2, 0)
 }
 
 func (r *tcellRenderer) renderEnemyField() {
@@ -222,13 +227,32 @@ func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 			descrString = "Resist 1"
 		}
 		cw.PutStringCenteredAt(descrString, currX+cardW/2, y+patrolZoneH)
-		if p == r.activePlayer {
+		unitHere := p.patrolZone[i]
+		if unitHere != nil {
+			r.drawUnit(unitHere, x+i*cardW+1, y+1, cardW-1, patrolZoneH-2)
+		}
+		if unitHere == nil && p == r.activePlayer {
 			cw.PutStringCenteredAt(hotkey, currX+cardW/2, y+patrolZoneH/2)
 		}
 	}
 }
 
+func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
+	cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
+	cw.DrawFilledRect(' ', x, y, w, h)
+	cw.PutTextInRect(u.card.getName(), x+1, y, w-2)
+	atk, hp := u.getAtkHp()
+	cw.PutStringCenteredAt(fmt.Sprintf("%d/%d", atk, hp), x+w/2, y+h-1)
+}
+
 func (r *tcellRenderer) drawLineAndIncrementY(line string, x int) {
 	cw.PutString(line, x, r.currUiLine)
 	r.currUiLine++
+}
+
+func (r *tcellRenderer) drawInfoRect(text string, centerX, centerY int) {
+	w := len(text) + 2
+	h := 3
+	cw.DrawFilledRect(' ', centerX-w/2, centerY-1, w, h-1)
+	cw.PutStringCenteredAt(text, centerX, centerY)
 }
