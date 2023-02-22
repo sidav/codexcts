@@ -52,6 +52,7 @@ func (r *tcellRenderer) renderHeader() {
 
 func (r *tcellRenderer) renderEnemyField() {
 	r.currUiLine = 1
+	r.renderOtherZone(r.enemy, 14, r.currUiLine)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.enemy.baseHealth), 0)
 	cw.ResetStyle()
@@ -76,6 +77,7 @@ func (r *tcellRenderer) renderEnemyField() {
 
 func (r *tcellRenderer) renderPlayerField() {
 	r.currUiLine = r.h/2 + 1
+	r.renderOtherZone(r.activePlayer, 14, r.currUiLine)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
 	cw.ResetStyle()
@@ -127,6 +129,15 @@ func (r *tcellRenderer) renderCardShort(c card, x, y, w, h int) {
 	cw.PutString(elementAndTechLine, x+1, y+h-1)
 }
 
+func (r *tcellRenderer) renderOtherZone(p *player, x, y int) {
+	for i, c := range p.otherZone {
+		str := fmt.Sprintf("%s",
+			c.card.getName(),
+		)
+		cw.PutString(str, x, y+i)
+	}
+}
+
 func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 	cw.ResetStyle()
 	cw.DrawFilledRect(' ', x, y, w, h)
@@ -159,7 +170,7 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 }
 
 func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
-	x := r.w - patrolZoneW - 12
+	x := r.w - patrolZoneW - 1
 	cw.ResetStyle()
 	cardW := patrolZoneW / 5
 	for i := 0; i < 5; i++ {

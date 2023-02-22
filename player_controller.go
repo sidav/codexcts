@@ -58,6 +58,14 @@ func (pc *playerController) mainPhase(g *game) {
 				pc.currentMode = PCMODE_NONE
 				pc.currentSelectedCardFromHand = nil
 			}
+		case "p":
+			switch pc.currentSelectedCardFromHand.(type) {
+			case *unitCard:
+				if g.tryPlayUnitCardFromHand(pc.currentSelectedCardFromHand) {
+					pc.currentMode = PCMODE_NONE
+					pc.currentSelectedCardFromHand = nil
+				}
+			}
 		}
 	}
 }

@@ -12,5 +12,16 @@ func (g *game) tryPlayCardAsWorker(c card) bool {
 }
 
 func (g *game) tryPlayUnitCardFromHand(c card) bool {
+	if g.currentPlayer.gold >= c.getCost() {
+		g.currentPlayer.otherZone = append(g.currentPlayer.otherZone, &unit{
+			card:   c,
+			tapped: false,
+			wounds: 0,
+			level:  0,
+		})
+		g.currentPlayer.hand.removeThis(c)
+		g.currentPlayer.gold -= c.getCost()
+		return true
+	}
 	return false
 }
