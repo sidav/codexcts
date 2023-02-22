@@ -32,18 +32,33 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerCo
 	r.renderHeader()
 	r.renderEnemyField()
 	r.renderPlayerField()
-	if pc.currentMode == PCMODE_CARD_FROM_HAND_SELECTED {
-		r.renderCardFromHand()
-	}
-	if pc.currentMode == PCMODE_UNIT_SELECTED {
-		r.renderSelectedUnit()
-	}
-	if pc.currentMode == PCMODE_MOVE_SELECTED_UNIT {
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
-		r.drawInfoRect(fmt.Sprintf("Where to move %s?", pc.currentSelectedUnit.card.getName()), r.w/2, r.h-cardShortH)
-	}
+
+	r.renderPcmodeSpecific()
 
 	cw.FlushScreen()
+}
+
+func (r *tcellRenderer) renderPcmodeSpecific() {
+	switch pc.currentMode {
+	case PCMODE_NONE:
+	case PCMODE_CARD_FROM_HAND_SELECTED:
+		r.renderCardFromHand()
+	case PCMODE_UNIT_SELECTED:
+		r.renderSelectedUnit()
+	case PCMODE_MOVE_SELECTED_UNIT:
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
+		r.drawFilledInfoRect(fmt.Sprintf("Where to move %s?", pc.currentSelectedUnit.card.getName()), r.w/2, r.h-cardShortH)
+	case PCMODE_SELECT_BUILDING:
+		r.renderSelectBuildingMenu()
+	default:
+		panic("Check for pc mode specifics in renderer!")
+	}
+}
+
+func (r *tcellRenderer) renderSelectBuildingMenu() {
+	wx, wy := r.w/3, r.h/3
+	ww, wh := r.w-(wx*2), r.h-(wy*2)
+	r.drawWindow("SELECT BUILDING", wx, wy, ww, wh, tcell.ColorBlue)
 }
 
 func (r *tcellRenderer) renderHeader() {
@@ -85,6 +100,7 @@ func (r *tcellRenderer) renderPlayerField() {
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
 	cw.ResetStyle()
+	r.drawLineAndIncrementY("(B)build", 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DRAW: %4d", len(r.activePlayer.draw)), 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DISCARD: %d", len(r.activePlayer.discard)), 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0)
@@ -250,7 +266,16 @@ func (r *tcellRenderer) drawLineAndIncrementY(line string, x int) {
 	r.currUiLine++
 }
 
-func (r *tcellRenderer) drawInfoRect(text string, centerX, centerY int) {
+func (r *tcellRenderer) drawWindow(header string, x, y, w, h int, borderColor tcell.Color) {
+	cw.SetStyle(tcell.ColorBlack, borderColor)
+	cw.DrawRect(x, y, w, h)
+	cw.SetStyle(borderColor, tcell.ColorBlack)
+	cw.PutStringCenteredAt(" "+header+" ", x+w/2, y)
+	cw.DrawFilledRect(' ', x+1, y+1, w-2, h-2)
+	cw.ResetStyle()
+}
+
+func (r *tcellRenderer) drawFilledInfoRect(text string, centerX, centerY int) {
 	w := len(text) + 2
 	h := 3
 	cw.DrawFilledRect(' ', centerX-w/2, centerY-1, w, h-1)

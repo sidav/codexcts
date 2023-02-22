@@ -54,6 +54,18 @@ func (p *player) sortHand() {
 	p.hand.sortByCost()
 }
 
+func (p *player) hasTechLevel(lvl int) bool {
+	if lvl == 0 {
+		return true
+	}
+	for _, b := range p.techBuildings {
+		if b.static.givesTech == lvl {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *player) drawCard() {
 	p.hand.moveFrom(&p.draw)
 }

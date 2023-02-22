@@ -1,7 +1,6 @@
 package main
 
 import (
-	"strconv"
 	"strings"
 	"time"
 )
@@ -11,8 +10,10 @@ const (
 	PCMODE_CARD_FROM_HAND_SELECTED
 	PCMODE_UNIT_SELECTED
 	PCMODE_MOVE_SELECTED_UNIT
+	PCMODE_SELECT_BUILDING
 )
 
+var playerHandSelectionKeys = "1234567890"
 var playerOtherZoneSelectionKeys = "qwert"
 var playerPatrolZoneSelectionKeys = "yuiop"
 
@@ -58,16 +59,18 @@ func (pc *playerController) mainPhase(g *game) {
 			pc.currentMode = PCMODE_NONE
 			pc.phaseEnded = true
 		}
-		// number pressed
-		if index, err := strconv.Atoi(key); err == nil && len(key) == 1 {
-			index--
-			if index < len(pc.controlsPlayer.hand) {
-				pc.currentMode = PCMODE_CARD_FROM_HAND_SELECTED
-				pc.currentSelectedCardFromHand = pc.controlsPlayer.hand[index]
-			}
+		// build
+		if key == "b" {
+			pc.currentMode = PCMODE_SELECT_BUILDING
+		}
+		// number pressed (select card from hand)
+		index := strings.Index(playerHandSelectionKeys, key)
+		if index != -1 && index < len(pc.controlsPlayer.hand) {
+			pc.currentMode = PCMODE_CARD_FROM_HAND_SELECTED
+			pc.currentSelectedCardFromHand = pc.controlsPlayer.hand[index]
 		}
 		// pressed qwert
-		index := strings.Index(playerOtherZoneSelectionKeys, key)
+		index = strings.Index(playerOtherZoneSelectionKeys, key)
 		if index != -1 {
 			if index < len(pc.controlsPlayer.otherZone) {
 				pc.currentMode = PCMODE_UNIT_SELECTED
@@ -124,6 +127,15 @@ func (pc *playerController) mainPhase(g *game) {
 		if index != -1 && index < 5 {
 			pc.controlsPlayer.moveUnit(pc.currentSelectedUnit, pc.selectedUnitZone, pc.selectedUnitIndex, PLAYERZONE_PATROL, index)
 			pc.currentMode = PCMODE_NONE
+		}
+	case PCMODE_SELECT_BUILDING:
+		switch key {
+		case "ESCAPE", "ENTER":
+			pc.currentMode = PCMODE_NONE
+		case "t": // try build next tech
+		case "o": // try build tower
+		case "s": // try build surplus
+		case "h": // try build hall
 		}
 	}
 }

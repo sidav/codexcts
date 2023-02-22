@@ -25,3 +25,16 @@ func (g *game) tryPlayUnitCardFromHand(c card) bool {
 	}
 	return false
 }
+
+func (g *game) canPlayerBuild(p *player, b *building) bool {
+	if !b.static.isAddon {
+		for _, tb := range p.techBuildings {
+			if tb != nil && tb.static == b.static {
+				return false
+			}
+		}
+	} else if p.addonBuilding != nil {
+		return false
+	}
+	return p.gold >= b.static.cost && p.workers >= b.static.requiresWorkers
+}
