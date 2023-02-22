@@ -79,10 +79,15 @@ func (g *game) performCurrentPhase() {
 	case 2:
 		g.upkeepPhase()
 	// Phase 3: Main
+	case 3:
+		// handled by player controllers by now
+
 	// Phase 4: Discard
 	case 4:
 		g.discardPhase()
-		// Phase 5: Select tech
+
+	// Phase 5: Select tech
+	case 5:
 	}
 }
 

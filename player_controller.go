@@ -1,12 +1,18 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 const (
 	PCMODE_NONE = iota
 	PCMODE_CARD_FROM_HAND_SELECTED
 	PCMODE_UNIT_SELECTED
 )
+
+var playerOtherZoneSelectionKeys = "qwert"
+var playerPatrolZoneSelectionKeys = "yuiop"
 
 type playerController struct {
 	controlsPlayer              *player
@@ -36,22 +42,32 @@ func (pc *playerController) mainPhase(g *game) {
 		case "ENTER":
 			pc.currentMode = PCMODE_NONE
 			pc.phaseEnded = true
-		case "1", "2", "3", "4", "5", "6":
-			index, err := strconv.Atoi(key)
-			if err != nil {
-				return
-			}
+		}
+		// number pressed
+		if index, err := strconv.Atoi(key); err == nil && len(key) == 1 {
 			index--
 			if index < len(pc.controlsPlayer.hand) {
 				pc.currentMode = PCMODE_CARD_FROM_HAND_SELECTED
 				pc.currentSelectedCardFromHand = pc.controlsPlayer.hand[index]
 			}
 		}
+		// pressed qwert
+		index := strings.Index(playerOtherZoneSelectionKeys, key)
+		if index != -1 {
+			if index < len(pc.controlsPlayer.otherZone) {
+				pc.currentMode = PCMODE_UNIT_SELECTED
+				pc.currentSelectedUnit = pc.controlsPlayer.otherZone[index]
+			}
+		}
+		// pressed yuiop
+		index = strings.Index(playerPatrolZoneSelectionKeys, key)
+		if index != -1 && index < 5 && pc.controlsPlayer.patrolZone[index] != nil {
+			pc.currentMode = PCMODE_UNIT_SELECTED
+			pc.currentSelectedUnit = pc.controlsPlayer.patrolZone[index]
+		}
 	case PCMODE_CARD_FROM_HAND_SELECTED:
 		switch key {
-		case "ESCAPE":
-			pc.exitGame = true
-		case "ENTER":
+		case "ESCAPE", "ENTER":
 			pc.currentMode = PCMODE_NONE
 		case "w":
 			if g.tryPlayCardAsWorker(pc.currentSelectedCardFromHand) {
@@ -66,6 +82,11 @@ func (pc *playerController) mainPhase(g *game) {
 					pc.currentSelectedCardFromHand = nil
 				}
 			}
+		}
+	case PCMODE_UNIT_SELECTED:
+		switch key {
+		case "ESCAPE", "ENTER":
+			pc.currentMode = PCMODE_NONE
 		}
 	}
 }

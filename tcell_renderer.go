@@ -33,11 +33,10 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerCo
 	r.renderEnemyField()
 	r.renderPlayerField()
 	if pc.currentMode == PCMODE_CARD_FROM_HAND_SELECTED {
-		r.renderCardFull(pc.currentSelectedCardFromHand, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
-		r.currUiLine = r.h/2 + cardFullH/2 + 1
-		r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "W - spend as worker"), r.w/2-cardFullW/2)
-		r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "P - play card"), r.w/2-cardFullW/2)
+		r.renderCardFromHand()
+	}
+	if pc.currentMode == PCMODE_UNIT_SELECTED {
+		r.renderSelectedUnit()
 	}
 
 	cw.FlushScreen()
@@ -129,15 +128,6 @@ func (r *tcellRenderer) renderCardShort(c card, x, y, w, h int) {
 	cw.PutString(elementAndTechLine, x+1, y+h-1)
 }
 
-func (r *tcellRenderer) renderOtherZone(p *player, x, y int) {
-	for i, c := range p.otherZone {
-		str := fmt.Sprintf("%s",
-			c.card.getName(),
-		)
-		cw.PutString(str, x, y+i)
-	}
-}
-
 func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 	cw.ResetStyle()
 	cw.DrawFilledRect(' ', x, y, w, h)
@@ -169,6 +159,35 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 	cw.PutString(elementAndTechLine, x+1, y+h-1)
 }
 
+func (r *tcellRenderer) renderCardFromHand() {
+	r.renderCardFull(pc.currentSelectedCardFromHand, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
+	cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
+	r.currUiLine = r.h/2 + cardFullH/2 + 1
+	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "W - spend as worker"), r.w/2-cardFullW/2)
+	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "P - play card"), r.w/2-cardFullW/2)
+}
+
+func (r *tcellRenderer) renderSelectedUnit() {
+	r.renderCardFull(pc.currentSelectedUnit.card, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
+	r.currUiLine = r.h/2 + cardFullH/2 + 1
+	cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
+	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "M - move to other zone"), r.w/2-cardFullW/2)
+	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "A - attack"), r.w/2-cardFullW/2)
+	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "U - use ability"), r.w/2-cardFullW/2)
+	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "L - level up"), r.w/2-cardFullW/2)
+}
+
+func (r *tcellRenderer) renderOtherZone(p *player, x, y int) {
+	const keys = "QWERT"
+	for i, c := range p.otherZone {
+		str := fmt.Sprintf("%s - %s",
+			string(keys[i]),
+			c.card.getName(),
+		)
+		cw.PutString(str, x, y+i)
+	}
+}
+
 func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 	x := r.w - patrolZoneW - 1
 	cw.ResetStyle()
@@ -178,22 +197,33 @@ func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorGray)
 		cw.DrawRect(currX, y, cardW, patrolZoneH)
 		cw.SetStyle(tcell.ColorGray, tcell.ColorBlack)
+		descrString := ""
+		hotkey := ""
 		switch i {
 		case 0:
-			cw.PutStringCenteredAt("Squad leader", currX+cardW/2, y+1)
-			cw.PutStringCenteredAt("+SHLD/Taunt", currX+cardW/2, y+patrolZoneH)
+			cw.PutStringCenteredAt(" Squad leader", currX+cardW/2, y+1)
+			hotkey = "Y"
+			descrString = "+SHLD/Taunt"
 		case 1:
 			cw.PutStringCenteredAt("Elite", currX+cardW/2, y+1)
-			cw.PutStringCenteredAt("+1 ATK", currX+cardW/2, y+patrolZoneH)
+			hotkey = "U"
+			descrString = "+1 ATK"
 		case 2:
 			cw.PutStringCenteredAt("Scavenger", x+i*cardW+cardW/2, y+1)
-			cw.PutStringCenteredAt("Dies: +1$", currX+cardW/2, y+patrolZoneH)
+			hotkey = "I"
+			descrString = "Dies: +1$"
 		case 3:
 			cw.PutStringCenteredAt("Technician", x+i*cardW+cardW/2, y+1)
-			cw.PutStringCenteredAt("Dies: +1 Card", currX+cardW/2, y+patrolZoneH)
+			hotkey = "O"
+			descrString = "Dies: +1 Card"
 		case 4:
 			cw.PutStringCenteredAt("Lookout", x+i*cardW+cardW/2, y+1)
-			cw.PutStringCenteredAt("Resist 1", currX+cardW/2, y+patrolZoneH)
+			hotkey = "P"
+			descrString = "Resist 1"
+		}
+		cw.PutStringCenteredAt(descrString, currX+cardW/2, y+patrolZoneH)
+		if p == r.activePlayer {
+			cw.PutStringCenteredAt(hotkey, currX+cardW/2, y+patrolZoneH/2)
 		}
 	}
 }
