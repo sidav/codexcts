@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	rnd random.PRNG
-	pc  *playerController
+	rnd  random.PRNG
+	pc   *playerController
+	aiPc *aiPlayerController
 )
 
 func main() {
@@ -23,6 +24,9 @@ func main() {
 		currentMode:                 PCMODE_NONE,
 		currentSelectedCardFromHand: nil,
 		currentSelectedUnit:         nil,
+	}
+	aiPc = &aiPlayerController{
+		controlsPlayer: g.players[1],
 	}
 	gameLoop(g)
 }

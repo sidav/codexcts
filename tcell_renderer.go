@@ -35,7 +35,7 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerCo
 
 	r.renderPcmodeSpecific()
 
-	if r.g.currentPhase == 5 {
+	if r.g.currentPhase == PHASE_CODEX {
 		r.renderCodexSelection(r.activePlayer)
 	}
 

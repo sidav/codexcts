@@ -8,6 +8,9 @@ func gameLoop(g *game) {
 			io.renderGame(g, g.currentPlayerNumber, pc)
 			pc.act(g)
 		}
+		if g.currentPlayer == aiPc.controlsPlayer {
+			aiPc.act(g)
+		}
 		pc.phaseEnded = false
 		g.endCurrentPhase()
 	}

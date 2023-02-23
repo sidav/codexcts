@@ -55,26 +55,8 @@ func (g *game) initGame() {
 	}
 }
 
-func (g *game) getCurrentPhaseName() string {
-	switch g.currentPhase {
-	case 0:
-		return "Apply tech"
-	case 1:
-		return "Ready"
-	case 2:
-		return "Upkeep"
-	case 3:
-		return "Main"
-	case 4:
-		return "Discard"
-	case 5:
-		return "Select tech"
-	}
-	panic("No phase name")
-}
-
 func (g *game) endCurrentPhase() {
-	if g.currentPhase == 5 &&
+	if g.currentPhase == PHASE_CODEX &&
 		// don't end phase if a player has not taken their cards
 		(g.currentPlayer.isObligatedToAdd2Cards() && g.currentPlayer.cardsAddedFromCodexThisTurn < 2) {
 		// BUG: only one card can be added if the player is not obligated to take two.
@@ -84,7 +66,7 @@ func (g *game) endCurrentPhase() {
 	}
 	g.currentPhase++
 	// end turn
-	if g.currentPhase > 5 {
+	if g.currentPhase == TOTAL_PHASES {
 		g.currentPhase = 0
 		g.currentPlayerNumber = (g.currentPlayerNumber + 1) % 2
 		g.currentPlayer = g.players[g.currentPlayerNumber]
@@ -97,24 +79,23 @@ func (g *game) endCurrentPhase() {
 func (g *game) performCurrentPhase() {
 	switch g.currentPhase {
 	// Phase 0: Apply tech
-	case 0:
+	case PHASE_APPLY_TECH:
 		g.applyTechPhase()
 	// Phase 1: Untap
-	case 1:
+	case PHASE_READY:
 		g.untapPhase()
 	// Phase 2: Upkeep
-	case 2:
+	case PHASE_UPKEEP:
 		g.upkeepPhase()
 	// Phase 3: Main
-	case 3:
+	case PHASE_MAIN:
 		// handled by player controllers by now
-
 	// Phase 4: Discard
-	case 4:
+	case PHASE_DISCARD:
 		g.discardPhase()
-
 	// Phase 5: Select tech
-	case 5:
+	case PHASE_CODEX:
+		// handled by player controllers by now
 	}
 }
 
@@ -123,9 +104,6 @@ func (g *game) applyTechPhase() {
 		if c != nil {
 			g.currentPlayer.discard.addToBottom(c)
 			g.currentPlayer.cardsToAddNextTurn[i] = nil
-		}
-		if g.currentPhase == 5 && g.currentPlayer.cardsAddedFromCodexThisTurn > 1 {
-			panic("Here")
 		}
 	}
 	g.currentPlayer.cardsAddedFromCodexThisTurn = 0

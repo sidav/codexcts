@@ -44,9 +44,9 @@ func (pc *playerController) resetState() {
 
 func (pc *playerController) act(g *game) {
 	switch g.currentPhase {
-	case 3:
+	case PHASE_MAIN:
 		pc.mainPhase(g)
-	case 5:
+	case PHASE_CODEX:
 		pc.selectCardFromCodex(g)
 	default:
 		pc.resetState()
