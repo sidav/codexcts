@@ -17,11 +17,30 @@ func (g *game) tryPlayUnitCardFromHand(c card) bool {
 			card:   c,
 			tapped: false,
 			wounds: 0,
-			level:  0,
 		})
 		g.currentPlayer.hand.removeThis(c)
 		g.currentPlayer.gold -= c.getCost()
 		return true
+	}
+	return false
+}
+
+func (g *game) tryPlayHeroCard(c card) bool {
+	if g.currentPlayer.gold >= c.getCost() {
+		g.currentPlayer.otherZone = append(g.currentPlayer.otherZone, &unit{
+			card:   c,
+			tapped: false,
+			wounds: 0,
+			level:  1,
+		})
+		g.currentPlayer.gold -= c.getCost()
+		for i, h := range g.currentPlayer.commandZone {
+			if h == c {
+				g.currentPlayer.commandZone[i] = nil
+				return true
+			}
+		}
+		panic("Something is wrong when playing a hero")
 	}
 	return false
 }

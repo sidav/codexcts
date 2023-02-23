@@ -11,6 +11,7 @@ const (
 	PCMODE_UNIT_SELECTED
 	PCMODE_MOVE_SELECTED_UNIT
 	PCMODE_SELECT_BUILDING
+	PCMODE_SELECT_HERO_TO_PLAY
 )
 
 var playerHandSelectionKeys = "1234567890"
@@ -43,7 +44,7 @@ func (pc *playerController) act(g *game) {
 	case 3:
 		pc.mainPhase(g)
 	default:
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 		pc.phaseEnded = true
 	}
 }
@@ -62,6 +63,9 @@ func (pc *playerController) mainPhase(g *game) {
 		// build
 		if key == "b" {
 			pc.currentMode = PCMODE_SELECT_BUILDING
+		}
+		if key == "c" {
+			pc.currentMode = PCMODE_SELECT_HERO_TO_PLAY
 		}
 		// number pressed (select card from hand)
 		index := strings.Index(playerHandSelectionKeys, key)
@@ -146,6 +150,17 @@ func (pc *playerController) mainPhase(g *game) {
 			}
 		case "l": // try build lab
 		case "h": // try build hall
+		}
+	case PCMODE_SELECT_HERO_TO_PLAY:
+		switch key {
+		case "ESCAPE", "ENTER":
+			pc.currentMode = PCMODE_NONE
+		}
+		index := strings.Index("123", key)
+		if index != -1 && pc.controlsPlayer.commandZone[index] != nil {
+			if g.tryPlayHeroCard(pc.controlsPlayer.commandZone[index]) {
+				pc.currentMode = PCMODE_NONE
+			}
 		}
 	}
 }

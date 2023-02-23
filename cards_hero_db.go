@@ -1,6 +1,6 @@
 package main
 
-var heroCardsDb = []heroCard{
+var heroCardsDb = []*heroCard{
 	{
 		cost:    2,
 		name:    "Trog Bashar",

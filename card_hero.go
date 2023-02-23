@@ -13,6 +13,14 @@ func (ch *heroCard) getName() string {
 	return ch.name
 }
 
+func (ch *heroCard) getElement() element {
+	return ch.element
+}
+
+func (ch *heroCard) isInStartingDeck() bool {
+	return false
+}
+
 func (ch *heroCard) getFormattedName() string {
 	return fmt.Sprintf("(%d) %-25s", ch.cost, ch.name)
 }

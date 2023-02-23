@@ -35,6 +35,9 @@ func (g *game) initGame() {
 	g.currentPlayer = g.players[0]
 	g.currentPlayerNumber = 0
 	g.currentPhase = 0
+
+	g.players[0].commandZone[0] = heroCardsDb[0]
+	g.players[0].commandZone[0] = heroCardsDb[1]
 }
 
 func (g *game) getCurrentPhaseName() string {
