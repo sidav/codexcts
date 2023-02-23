@@ -14,6 +14,10 @@ func (ch *heroCard) getName() string {
 	return ch.name
 }
 
+func (ch *heroCard) getSubtype() string {
+	return ""
+}
+
 func (ch *heroCard) getElement() element {
 	return ch.element
 }

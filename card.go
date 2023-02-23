@@ -6,4 +6,5 @@ type card interface {
 	isInStartingDeck() bool
 	getElement() element
 	getFormattedName() string
+	getSubtype() string
 }

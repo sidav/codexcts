@@ -5,6 +5,7 @@ import "fmt"
 type unitCard struct {
 	cost         int
 	name         string
+	subtype      string
 	element      element
 	techLevel    int
 	baseAtk      int
@@ -15,6 +16,10 @@ type unitCard struct {
 
 func (uc *unitCard) getName() string {
 	return uc.name
+}
+
+func (uc *unitCard) getSubtype() string {
+	return uc.subtype
 }
 
 func (uc *unitCard) getFormattedName() string {

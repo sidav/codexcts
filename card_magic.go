@@ -5,6 +5,10 @@ import "fmt"
 type magicCard struct {
 	cost         int
 	name         string
+	subtype      string // buff, debuff, etc
+	isMinor      bool
+	isUltimate   bool
+	isOngoing    bool
 	description  string
 	element      element
 	startingDeck bool
@@ -12,6 +16,10 @@ type magicCard struct {
 
 func (mc *magicCard) getName() string {
 	return mc.name
+}
+
+func (mc *magicCard) getSubtype() string {
+	return mc.subtype
 }
 
 func (mc *magicCard) getFormattedName() string {

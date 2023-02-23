@@ -36,9 +36,10 @@ func (r *tcellRenderer) renderCardInHand(c card, x, y, w, h int) {
 func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 	cw.ResetStyle()
 	cw.DrawFilledRect(' ', x, y, w, h)
+	separatorRelY := h / 4
 	cw.SetStyle(tcell.ColorGray, tcell.ColorDarkGray)
 	cw.DrawRect(x, y, w, h)
-	cw.DrawRect(x, y, w, h/4)
+	cw.DrawRect(x, y, w, separatorRelY)
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 	cw.PutString(fmt.Sprintf(" $%d ", c.getCost()), x+1, y+1)
 	cw.ResetStyle()
@@ -49,13 +50,26 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 		mc := c.(*magicCard)
 		elementAndTechLine += " Magic"
 		cw.SetFg(tcell.ColorGray)
+		spellDesc := ""
+		if mc.isMinor {
+			spellDesc = "Minor " + spellDesc
+		}
+		if mc.isUltimate {
+			spellDesc = "Ultimate " + spellDesc
+		}
+		if mc.isOngoing {
+			spellDesc = "Ongoing " + spellDesc
+		}
+		spellDesc += "Spell - " + mc.getSubtype()
+		cw.PutStringCenteredAt(spellDesc, x+w/2, y+separatorRelY-1)
 		cw.PutTextInRect(mc.description, x+1, y+h/4+3, w-2)
 		cw.ResetStyle()
 	case *unitCard:
 		cc := c.(*unitCard)
 		cw.SetFg(tcell.ColorGray)
+		cw.PutStringCenteredAt("Unit - "+cc.getSubtype(), x+w/2, y+separatorRelY-1)
 		for i := range cc.specials {
-			cw.PutStringCenteredAt(cc.specials[i].getFormattedName(), x+w/2, y+h/4+3+i)
+			cw.PutStringCenteredAt(cc.specials[i].getFormattedName(), x+w/2, y+separatorRelY+3+i)
 		}
 		cw.ResetStyle()
 		elementAndTechLine += fmt.Sprintf(" Tech %d", cc.techLevel)
