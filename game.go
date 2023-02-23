@@ -57,6 +57,7 @@ func (g *game) getCurrentPhaseName() string {
 
 func (g *game) endCurrentPhase() {
 	g.currentPhase++
+	// end turn
 	if g.currentPhase > 5 {
 		g.currentPhase = 0
 		g.currentPlayerNumber = (g.currentPlayerNumber + 1) % 2
@@ -115,11 +116,19 @@ func (g *game) untapPhase() {
 }
 
 func (g *game) upkeepPhase() {
-	g.players[g.currentPlayerNumber].gold += g.players[g.currentPlayerNumber].workers
+	g.currentPlayer.gold += g.currentPlayer.workers
+	if g.currentPlayer.addonBuilding != nil && g.currentPlayer.addonBuilding.isUnderConstruction {
+		g.currentPlayer.addonBuilding.isUnderConstruction = false
+	}
+	for _, tb := range g.currentPlayer.techBuildings {
+		if tb != nil && tb.isUnderConstruction {
+			tb.isUnderConstruction = false
+		}
+	}
 }
 
 func (g *game) discardPhase() {
-	p := g.players[g.currentPlayerNumber]
+	p := g.currentPlayer
 	cardsToDraw := len(p.hand) + 2
 	if cardsToDraw >= 5 {
 		cardsToDraw = 5

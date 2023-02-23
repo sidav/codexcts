@@ -1,8 +1,9 @@
 package main
 
 type building struct {
-	static           *buildingStatic
-	currentHitpoints int
+	static              *buildingStatic
+	currentHitpoints    int
+	isUnderConstruction bool
 }
 
 type buildingStatic struct {
@@ -12,6 +13,24 @@ type buildingStatic struct {
 	requiresWorkers int
 	givesTech       int
 	isAddon         bool
+}
+
+func getBuildingStaticByName(name string) *buildingStatic {
+	for i := range sTableBuildings {
+		if sTableBuildings[i].name == name {
+			return sTableBuildings[i]
+		}
+	}
+	panic("No building with that name!")
+}
+
+func getTechBuildingByTechLevel(level int) *buildingStatic {
+	for i := range sTableBuildings {
+		if sTableBuildings[i].givesTech == level {
+			return sTableBuildings[i]
+		}
+	}
+	panic("No building with that name!")
 }
 
 var sTableBuildings = []*buildingStatic{

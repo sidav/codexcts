@@ -26,15 +26,46 @@ func (g *game) tryPlayUnitCardFromHand(c card) bool {
 	return false
 }
 
-func (g *game) canPlayerBuild(p *player, b *building) bool {
-	if !b.static.isAddon {
+func (g *game) canPlayerBuild(p *player, b *buildingStatic) bool {
+	if !b.isAddon {
 		for _, tb := range p.techBuildings {
-			if tb != nil && tb.static == b.static {
+			if tb != nil && tb.static == b {
 				return false
 			}
 		}
 	} else if p.addonBuilding != nil {
 		return false
 	}
-	return p.gold >= b.static.cost && p.workers >= b.static.requiresWorkers
+	return p.gold >= b.cost && p.workers >= b.requiresWorkers
+}
+
+func (g *game) tryBuildNextTechForPlayer(p *player) bool {
+	for i := range p.techBuildings {
+		if p.techBuildings[i] == nil {
+			tb := getTechBuildingByTechLevel(i + 1)
+			g.tryBuildBuildingForPlayer(p, tb)
+			return true
+		}
+	}
+	return false
+}
+
+func (g *game) tryBuildBuildingForPlayer(p *player, b *buildingStatic) bool {
+	if !g.canPlayerBuild(p, b) {
+		return false
+	}
+	if b.isAddon {
+		p.addonBuilding = &building{
+			static:              b,
+			currentHitpoints:    b.maxHitpoints,
+			isUnderConstruction: true,
+		}
+	} else {
+		p.techBuildings[b.givesTech] = &building{
+			static:              b,
+			currentHitpoints:    b.maxHitpoints,
+			isUnderConstruction: true,
+		}
+	}
+	return true
 }

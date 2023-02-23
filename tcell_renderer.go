@@ -56,9 +56,32 @@ func (r *tcellRenderer) renderPcmodeSpecific() {
 }
 
 func (r *tcellRenderer) renderSelectBuildingMenu() {
-	wx, wy := r.w/3, r.h/3
-	ww, wh := r.w-(wx*2), r.h-(wy*2)
+	ww, wh := r.w/4, r.h/2
+	wx, wy := r.w/2-ww/2, r.h/2-wh/2
 	r.drawWindow("SELECT BUILDING", wx, wy, ww, wh, tcell.ColorBlue)
+	r.currUiLine = wy + 2
+	for _, b := range sTableBuildings {
+		hotkey := "NO HOTKEY"
+		if r.g.canPlayerBuild(r.activePlayer, b) {
+			cw.ResetStyle()
+		} else {
+			cw.SetFg(tcell.ColorDarkGray)
+		}
+		if b.givesTech > 0 {
+			hotkey = "T"
+			r.drawLineAndIncrementY(fmt.Sprintf("%s - build %s", hotkey, b.name), wx+2)
+		} else {
+			switch b.name {
+			case "Tower":
+				hotkey = "O"
+			case "Surplus":
+				hotkey = "S"
+			}
+			r.drawLineAndIncrementY(fmt.Sprintf("%s - build %s (Add-on)", hotkey, b.name), wx+2)
+		}
+		r.drawLineAndIncrementY(fmt.Sprintf("   $%d, requires %d workers", b.cost, b.requiresWorkers), wx+1)
+		r.currUiLine++
+	}
 }
 
 func (r *tcellRenderer) renderHeader() {
@@ -100,6 +123,15 @@ func (r *tcellRenderer) renderPlayerField() {
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
 	cw.ResetStyle()
+	for _, tb := range r.activePlayer.techBuildings {
+		if tb != nil {
+			line := tb.static.name
+			if tb.isUnderConstruction {
+				line += " (under construction)"
+			}
+			r.drawLineAndIncrementY(line, 0)
+		}
+	}
 	r.drawLineAndIncrementY("(B)build", 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DRAW: %4d", len(r.activePlayer.draw)), 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DISCARD: %d", len(r.activePlayer.discard)), 0)
@@ -117,11 +149,11 @@ func (r *tcellRenderer) renderHand() {
 		cardW = r.w / 5
 	}
 	for i, c := range r.activePlayer.hand {
-		r.renderCardShort(c, i*(cardW), r.h-cardShortH, cardW, cardShortH)
+		r.renderCardInHand(c, i*(cardW), r.h-cardShortH, cardW, cardShortH)
 	}
 }
 
-func (r *tcellRenderer) renderCardShort(c card, x, y, w, h int) {
+func (r *tcellRenderer) renderCardInHand(c card, x, y, w, h int) {
 	cw.SetStyle(tcell.ColorGray, tcell.ColorDarkGray)
 	cw.DrawRect(x, y, w, h)
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)

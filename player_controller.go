@@ -133,8 +133,18 @@ func (pc *playerController) mainPhase(g *game) {
 		case "ESCAPE", "ENTER":
 			pc.currentMode = PCMODE_NONE
 		case "t": // try build next tech
+			if g.tryBuildNextTechForPlayer(pc.controlsPlayer) {
+				pc.currentMode = PCMODE_NONE
+			}
 		case "o": // try build tower
+			if g.tryBuildBuildingForPlayer(pc.controlsPlayer, getBuildingStaticByName("Tower")) {
+				pc.currentMode = PCMODE_NONE
+			}
 		case "s": // try build surplus
+			if g.tryBuildBuildingForPlayer(pc.controlsPlayer, getBuildingStaticByName("Surplus")) {
+				pc.currentMode = PCMODE_NONE
+			}
+		case "l": // try build lab
 		case "h": // try build hall
 		}
 	}
