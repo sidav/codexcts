@@ -99,3 +99,13 @@ func (g *game) tryBuildBuildingForPlayer(p *player, b *buildingStatic) bool {
 	}
 	return true
 }
+
+func (g *game) tryAddCardFromCodex(p *player, c card, codexIndex int) bool {
+	if p.codices[codexIndex].getCardCount(c) == 0 {
+		return false
+	}
+	p.codices[codexIndex].removeSingleCard(c)
+	p.cardsToAddNextTurn[p.cardsAddedFromCodexThisTurn] = c
+	p.cardsAddedFromCodexThisTurn++
+	return true
+}

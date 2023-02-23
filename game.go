@@ -74,6 +74,11 @@ func (g *game) getCurrentPhaseName() string {
 }
 
 func (g *game) endCurrentPhase() {
+	if g.currentPhase == 5 && !(g.currentPlayer.cardsAddedFromCodexThisTurn == 2 || g.currentPlayer.workers >= 10) {
+		if g.currentPlayer == pc.controlsPlayer { // TODO: remove this debug condition
+			return
+		}
+	}
 	g.currentPhase++
 	// end turn
 	if g.currentPhase > 5 {
@@ -116,7 +121,11 @@ func (g *game) applyTechPhase() {
 			g.currentPlayer.discard.addToBottom(c)
 			g.currentPlayer.cardsToAddNextTurn[i] = nil
 		}
+		if g.currentPhase == 5 && g.currentPlayer.cardsAddedFromCodexThisTurn > 1 {
+			panic("Here")
+		}
 	}
+	g.currentPlayer.cardsAddedFromCodexThisTurn = 0
 }
 
 func (g *game) untapPhase() {

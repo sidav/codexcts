@@ -6,10 +6,11 @@ type player struct {
 	discard cardStack
 	codices [3]codex // one per element
 
-	patrolZone         [5]*unit
-	commandZone        [3]*heroCard
-	otherZone          []*unit
-	cardsToAddNextTurn [2]card
+	patrolZone                  [5]*unit
+	commandZone                 [3]*heroCard
+	otherZone                   []*unit
+	cardsToAddNextTurn          [2]card
+	cardsAddedFromCodexThisTurn int
 
 	gold                int
 	workers             int

@@ -43,13 +43,13 @@ func (pc *playerController) resetState() {
 }
 
 func (pc *playerController) act(g *game) {
-	pc.currentMode = PCMODE_NONE
 	switch g.currentPhase {
 	case 3:
 		pc.mainPhase(g)
 	case 5:
 		pc.selectCardFromCodex(g)
 	default:
+		pc.resetState()
 		time.Sleep(200 * time.Millisecond)
 		pc.phaseEnded = true
 	}
@@ -176,21 +176,27 @@ func (pc *playerController) mainPhase(g *game) {
 }
 
 func (pc *playerController) selectCardFromCodex(g *game) {
-	pc.currentSelectedCardFromHand = nil
 	key := readKey()
 	switch key {
 	case "ESCAPE":
 		pc.exitGame = true
 		return
 	case "ENTER":
-		pc.phaseEnded = true
-		return
+		if pc.currentSelectedCardFromHand != nil {
+			if g.tryAddCardFromCodex(pc.controlsPlayer, pc.currentSelectedCardFromHand, pc.currentCodexPage) {
+				pc.phaseEnded = true
+				pc.currentSelectedCardFromHand = nil
+				return
+			}
+		}
 	case "LEFT":
+		pc.currentSelectedCardFromHand = nil
 		pc.currentCodexPage--
 		if pc.currentCodexPage == -1 {
 			pc.currentCodexPage = 2
 		}
 	case "RIGHT":
+		pc.currentSelectedCardFromHand = nil
 		pc.currentCodexPage++
 		if pc.currentCodexPage == 3 {
 			pc.currentCodexPage = 0
@@ -200,6 +206,8 @@ func (pc *playerController) selectCardFromCodex(g *game) {
 	index := strings.Index(playerCodexCardSelectionKeys, key)
 	if index != -1 {
 		pc.currentSelectedCardFromHand = pc.controlsPlayer.codices[pc.currentCodexPage].getCardByIndex(index)
+	} else {
+		pc.currentSelectedCardFromHand = nil
 	}
 
 	for pc.controlsPlayer.codices[pc.currentCodexPage].getTotalCardsCount() == 0 {
