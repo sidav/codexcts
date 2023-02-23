@@ -192,7 +192,7 @@ func (r *tcellRenderer) renderCommandZone(p *player) {
 	cx, cy := wx+2, wy+2
 	for i, h := range p.commandZone {
 		if h != nil {
-			r.renderCardFull(h, cx+i*(cardW)+2, cy, cardW, cardH)
+			r.renderCardFull(h, cx+i*(cardW+2), cy, cardW, cardH)
 		}
 	}
 }

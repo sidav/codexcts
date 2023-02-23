@@ -10,6 +10,11 @@ var heroCardsDb = []*heroCard{
 			{5, 3, 4},
 			{8, 4, 5},
 		},
+		levelsAbilitiesTexts: []string{
+			"",
+			"Attacks: deal 1 damage to that opponent's base (target).",
+			"Readiness",
+		},
 	},
 	{
 		cost:    2,
@@ -19,6 +24,11 @@ var heroCardsDb = []*heroCard{
 			{1, 2, 3},
 			{3, 2, 4},
 			{5, 3, 4},
+		},
+		levelsAbilitiesTexts: []string{
+			"",
+			"TAP: Sideline a tech 0 or tech 1 patroller.",
+			"Your tech 0 units cost 1 less to play.",
 		},
 	},
 }

@@ -3,10 +3,11 @@ package main
 import "fmt"
 
 type heroCard struct {
-	cost         int
-	name         string
-	element      element
-	levelsAttDef [][3]int // [level baseAtt baseDef]
+	cost                 int
+	name                 string
+	element              element
+	levelsAttDef         [][3]int // [level baseAtt baseDef]
+	levelsAbilitiesTexts []string
 }
 
 func (ch *heroCard) getName() string {

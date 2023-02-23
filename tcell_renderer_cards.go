@@ -64,12 +64,15 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 		elementAndTechLine += " Hero"
 		hc := c.(*heroCard)
 		levelsStr := fmt.Sprintf("LEVELS 1-%d: %d/%d \n ", hc.levelsAttDef[1][0]-1, hc.levelsAttDef[1][1], hc.levelsAttDef[1][2])
+		levelsStr += hc.levelsAbilitiesTexts[0] + " \n "
 		for i := 1; i < len(hc.levelsAttDef)-1; i++ {
 			levelsStr += fmt.Sprintf("LEVELS %d-%d: %d/%d \n ", hc.levelsAttDef[i][0], hc.levelsAttDef[i+1][0]-1,
 				hc.levelsAttDef[i][1], hc.levelsAttDef[i][2])
+			levelsStr += hc.levelsAbilitiesTexts[i] + " \n \n "
 		}
 		levelsStr += fmt.Sprintf("LEVEL %d: %d/%d \n ", hc.levelsAttDef[len(hc.levelsAttDef)-1][0],
 			hc.levelsAttDef[len(hc.levelsAttDef)-1][1], hc.levelsAttDef[len(hc.levelsAttDef)-1][2])
+		levelsStr += hc.levelsAbilitiesTexts[len(hc.levelsAttDef)-1] + " \n "
 		cw.PutTextInRect(levelsStr, x+1, y+h/4+1, w-2)
 	}
 	cw.PutString(elementAndTechLine, x+1, y+h-1)
