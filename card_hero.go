@@ -28,3 +28,7 @@ func (ch *heroCard) getFormattedName() string {
 func (ch *heroCard) getCost() int {
 	return ch.cost
 }
+
+func (ch *heroCard) getMaxLevel() int {
+	return ch.levelsAttDef[len(ch.levelsAttDef)-1][0]
+}

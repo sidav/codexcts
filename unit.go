@@ -8,6 +8,11 @@ type unit struct {
 	level  int // needed only for heroes
 }
 
+func (u *unit) isHero() bool {
+	_, ok := u.card.(*heroCard)
+	return ok
+}
+
 func (u *unit) getAtkHp() (int, int) {
 	switch u.card.(type) {
 	case *unitCard:

@@ -69,6 +69,17 @@ func (g *game) tryBuildNextTechForPlayer(p *player) bool {
 	return false
 }
 
+func (g *game) tryLevelUpHero(p *player, unit *unit) bool {
+	if unit.isHero() {
+		if p.gold > 0 && unit.card.(*heroCard).getMaxLevel() > unit.level {
+			p.gold--
+			unit.level++
+			return true
+		}
+	}
+	return false
+}
+
 func (g *game) tryBuildBuildingForPlayer(p *player, b *buildingStatic) bool {
 	if !g.canPlayerBuild(p, b) {
 		return false

@@ -115,6 +115,10 @@ func (pc *playerController) mainPhase(g *game) {
 			pc.currentMode = PCMODE_NONE
 		case "m":
 			pc.currentMode = PCMODE_MOVE_SELECTED_UNIT
+		case "l":
+			if g.tryLevelUpHero(pc.controlsPlayer, pc.currentSelectedUnit) {
+				pc.currentMode = PCMODE_NONE
+			}
 		}
 	case PCMODE_MOVE_SELECTED_UNIT:
 		switch key {

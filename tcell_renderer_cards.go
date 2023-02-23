@@ -80,7 +80,7 @@ func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
 	cw.DrawFilledRect(' ', x, y, w, h)
 	cw.PutTextInRect(u.card.getName(), x+1, y, w-2)
 	atk, hp := u.getAtkHp()
-	if _, ok := u.card.(*heroCard); ok {
+	if u.isHero() {
 		cw.PutStringCenteredAt(fmt.Sprintf("LEVEL %d", u.level), x+w/2, y+h-2)
 	}
 	cw.PutStringCenteredAt(fmt.Sprintf("%d/%d", atk, hp), x+w/2, y+h-1)
