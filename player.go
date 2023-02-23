@@ -4,6 +4,7 @@ type player struct {
 	hand    cardStack
 	draw    cardStack
 	discard cardStack
+	codices [3]codex // one per element
 
 	patrolZone         [5]*unit
 	commandZone        [3]*heroCard

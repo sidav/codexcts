@@ -132,7 +132,7 @@ var cardsDb = []card{
 	},
 	&magicCard{
 		cost:        0,
-		name:        "Wrecking Ball",
+		name:        "The Boot",
 		subtype:     "Debuff",
 		description: "Destroy a tech 0 or tech 1 unit.",
 		element:     ELEMENT_BASHING,
@@ -211,6 +211,17 @@ var cardsDb = []card{
 		baseAtk:   4,
 		baseHP:    3,
 		specials:  []unitSpecial{{name: "Flying"}},
+		// Arrives: gets stealth this turn
+	},
+	&unitCard{
+		cost:      5,
+		name:      "Harvest Reaper",
+		subtype:   "Contraption",
+		element:   ELEMENT_BASHING,
+		techLevel: 2,
+		baseAtk:   6,
+		baseHP:    5,
+		specials:  []unitSpecial{{name: "Overpower"}},
 		// Arrives: gets stealth this turn
 	},
 	&unitCard{

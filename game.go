@@ -38,6 +38,21 @@ func (g *game) initGame() {
 
 	g.players[0].commandZone[0] = heroCardsDb[0]
 	g.players[1].commandZone[0] = heroCardsDb[1]
+
+	// form codices
+	for _, p := range g.players {
+		for i, hero := range p.commandZone {
+			if hero != nil {
+				for _, c := range cardsDb {
+					if c.getElement() == hero.getElement() {
+						// adding two of each card
+						p.codices[i].addCard(c)
+						p.codices[i].addCard(c)
+					}
+				}
+			}
+		}
+	}
 }
 
 func (g *game) getCurrentPhaseName() string {

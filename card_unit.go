@@ -23,7 +23,7 @@ func (uc *unitCard) getSubtype() string {
 }
 
 func (uc *unitCard) getFormattedName() string {
-	return fmt.Sprintf("(%d) %-25s %d/%d", uc.cost, uc.name, uc.baseAtk, uc.baseHP)
+	return fmt.Sprintf("($%d) %-25s %d/%d", uc.cost, uc.name, uc.baseAtk, uc.baseHP)
 }
 
 func (uc *unitCard) getCost() int {

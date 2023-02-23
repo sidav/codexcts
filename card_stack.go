@@ -7,6 +7,10 @@ import (
 
 type cardStack []card
 
+func (s *cardStack) size() int {
+	return len(*s)
+}
+
 func (s *cardStack) removeThis(c card) {
 	for i := range *s {
 		if (*s)[i] == c {

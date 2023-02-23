@@ -12,11 +12,13 @@ const (
 	PCMODE_MOVE_SELECTED_UNIT
 	PCMODE_SELECT_BUILDING
 	PCMODE_SELECT_HERO_TO_PLAY
+	PCMODE_SELECT_CARD_FROM_CODEX
 )
 
 var playerHandSelectionKeys = "1234567890"
 var playerOtherZoneSelectionKeys = "qwert"
 var playerPatrolZoneSelectionKeys = "yuiop"
+var playerCodexCardSelectionKeys = "1234567890qw"
 
 type playerController struct {
 	controlsPlayer              *player
@@ -26,6 +28,7 @@ type playerController struct {
 	currentSelectedUnit *unit
 	selectedUnitZone    int
 	selectedUnitIndex   int
+	currentCodexPage    int
 
 	exitGame   bool
 	phaseEnded bool
@@ -40,9 +43,12 @@ func (pc *playerController) resetState() {
 }
 
 func (pc *playerController) act(g *game) {
+	pc.currentMode = PCMODE_NONE
 	switch g.currentPhase {
 	case 3:
 		pc.mainPhase(g)
+	case 5:
+		pc.selectCardFromCodex(g)
 	default:
 		time.Sleep(200 * time.Millisecond)
 		pc.phaseEnded = true
@@ -166,5 +172,37 @@ func (pc *playerController) mainPhase(g *game) {
 				pc.currentMode = PCMODE_NONE
 			}
 		}
+	}
+}
+
+func (pc *playerController) selectCardFromCodex(g *game) {
+	pc.currentSelectedCardFromHand = nil
+	key := readKey()
+	switch key {
+	case "ESCAPE":
+		pc.exitGame = true
+		return
+	case "ENTER":
+		pc.phaseEnded = true
+		return
+	case "LEFT":
+		pc.currentCodexPage--
+		if pc.currentCodexPage == -1 {
+			pc.currentCodexPage = 2
+		}
+	case "RIGHT":
+		pc.currentCodexPage++
+		if pc.currentCodexPage == 3 {
+			pc.currentCodexPage = 0
+		}
+	}
+
+	index := strings.Index(playerCodexCardSelectionKeys, key)
+	if index != -1 {
+		pc.currentSelectedCardFromHand = pc.controlsPlayer.codices[pc.currentCodexPage].getCardByIndex(index)
+	}
+
+	for pc.controlsPlayer.codices[pc.currentCodexPage].getTotalCardsCount() == 0 {
+		pc.currentCodexPage--
 	}
 }

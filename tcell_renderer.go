@@ -35,6 +35,10 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerCo
 
 	r.renderPcmodeSpecific()
 
+	if r.g.currentPhase == 5 {
+		r.renderCodexSelection(r.activePlayer)
+	}
+
 	cw.FlushScreen()
 }
 
@@ -194,6 +198,32 @@ func (r *tcellRenderer) renderCommandZone(p *player) {
 		if h != nil {
 			r.renderCardFull(h, cx+i*(cardW+2), cy, cardW, cardH)
 		}
+	}
+}
+
+func (r *tcellRenderer) renderCodexSelection(p *player) {
+	ww, wh := r.w-r.w/5, r.h-r.h/10
+	wx, wy := (r.w-ww)/2, (r.h-wh)/2
+	cardW, cardH := 2*ww/5, wh-2
+	cardX, cardY := wx+ww-cardW, wy+1
+	r.drawWindow("SELECT CARDS FROM YOUR CODEX", wx, wy, ww, wh, tcell.ColorBlue)
+	if pc.currentSelectedCardFromHand != nil {
+		r.renderCardFull(pc.currentSelectedCardFromHand, cardX, cardY, cardW, cardH)
+	} else {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
+		cw.DrawRect(cardX, cardY, 0, cardH)
+		cw.ResetStyle()
+		cw.PutStringCenteredAt("Select a card", cardX+cardW/2, cardY+cardH/2)
+	}
+	r.currUiLine = wy + 1
+	for i := range p.codices[pc.currentCodexPage].cards {
+		if p.codices[pc.currentCodexPage].cardsCounts[i] > 0 {
+			cw.SetFg(tcell.ColorWhite)
+		} else {
+			cw.SetFg(tcell.ColorDarkGray)
+		}
+		r.drawLineAndIncrementY(fmt.Sprintf("%s - %-25s (x%d)", string(playerCodexCardSelectionKeys[i]),
+			p.codices[pc.currentCodexPage].getCardByIndex(i).getName(), p.codices[pc.currentCodexPage].cardsCounts[i]), wx+1)
 	}
 }
 

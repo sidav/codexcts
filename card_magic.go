@@ -23,7 +23,7 @@ func (mc *magicCard) getSubtype() string {
 }
 
 func (mc *magicCard) getFormattedName() string {
-	return fmt.Sprintf("(%d) %-25s", mc.cost, mc.name)
+	return fmt.Sprintf("($%d) %-25s", mc.cost, mc.name)
 }
 
 func (mc *magicCard) getCost() int {
