@@ -74,7 +74,10 @@ func (g *game) getCurrentPhaseName() string {
 }
 
 func (g *game) endCurrentPhase() {
-	if g.currentPhase == 5 && !(g.currentPlayer.cardsAddedFromCodexThisTurn == 2 || g.currentPlayer.workers >= 10) {
+	if g.currentPhase == 5 &&
+		// don't end phase if a player has not taken their cards
+		(g.currentPlayer.isObligatedToAdd2Cards() && g.currentPlayer.cardsAddedFromCodexThisTurn < 2) {
+		// BUG: only one card can be added if the player is not obligated to take two.
 		if g.currentPlayer == pc.controlsPlayer { // TODO: remove this debug condition
 			return
 		}

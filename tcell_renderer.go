@@ -124,7 +124,7 @@ func (r *tcellRenderer) renderEnemyField() {
 }
 
 func (r *tcellRenderer) renderPlayerField() {
-	r.currUiLine = r.h/2 + 1
+	r.currUiLine = r.h / 2
 	r.renderOtherZone(r.activePlayer, 14, r.currUiLine)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
@@ -144,6 +144,8 @@ func (r *tcellRenderer) renderPlayerField() {
 	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
 	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.activePlayer.gold), 0)
+	cw.ResetStyle()
+	r.drawLineAndIncrementY("C - access command zone", 0)
 	r.renderPatrolZone(r.activePlayer, r.h-cardShortH-patrolZoneH-2)
 	r.renderHand()
 }

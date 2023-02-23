@@ -184,11 +184,11 @@ func (pc *playerController) selectCardFromCodex(g *game) {
 	case "ENTER":
 		if pc.currentSelectedCardFromHand != nil {
 			if g.tryAddCardFromCodex(pc.controlsPlayer, pc.currentSelectedCardFromHand, pc.currentCodexPage) {
-				pc.phaseEnded = true
 				pc.currentSelectedCardFromHand = nil
-				return
 			}
 		}
+		pc.phaseEnded = true
+		return
 	case "LEFT":
 		pc.currentSelectedCardFromHand = nil
 		pc.currentCodexPage--
