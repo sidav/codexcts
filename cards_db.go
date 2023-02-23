@@ -224,4 +224,125 @@ var cardsDb = []card{
 		specials:  []unitSpecial{{name: "Obliterate", value: 2}},
 		// Arrives or attacks: deal 4 damage to a building
 	},
+
+	// FINESSE DECK
+	&magicCard{
+		cost:      2,
+		name:      "Harmony",
+		isOngoing: true,
+		subtype:   "Buff",
+		// channeling
+		description: "Whenever you play a spell, summon a 0/1 neutral Dancer token (limit: 3). \n Sacrifice Harmony: " +
+			"\"Stop the music.\" (Flip Dancers tokens)",
+		element: ELEMENT_FINESSE,
+	},
+	&magicCard{
+		cost:        2,
+		name:        "Discord",
+		subtype:     "Debuff",
+		description: "Give all opponent's tech 0 and tech 1 units -2/-1 until end of turn.",
+		element:     ELEMENT_FINESSE,
+	},
+	&magicCard{
+		cost:      2,
+		name:      "Two Step",
+		isOngoing: true,
+		subtype:   "Buff (target)",
+		// channeling
+		description: "Two of your units become dance partners if they aren't partnered already. While you control both, " +
+			"they each get +2/+2. If you lose one, sacrifice Two Step.",
+		element: ELEMENT_FINESSE,
+	},
+	&magicCard{
+		cost:       1,
+		name:       "Appel Stomp",
+		isUltimate: true,
+		subtype:    "Debuff",
+		// channeling
+		description: "Sideline a patroller, draw a card, then you may put Appel Stomp on top of your draw pile.",
+		element:     ELEMENT_FINESSE,
+	},
+	&unitCard{
+		cost:      2,
+		name:      "Nimble Fencer",
+		subtype:   "Virtuoso",
+		element:   ELEMENT_FINESSE,
+		techLevel: 1,
+		baseAtk:   2,
+		baseHP:    3,
+		// specials:     []unitSpecial{{name: "Frenzy", value: 1}},
+		// your Virtuosos have haste.
+	},
+	&unitCard{
+		cost:      2,
+		name:      "Star-Crossed Starlet",
+		subtype:   "Virtuoso",
+		element:   ELEMENT_FINESSE,
+		techLevel: 1,
+		baseAtk:   3,
+		baseHP:    2,
+		// specials:     []unitSpecial{{name: "Frenzy", value: 1}},
+		// upkeep: this takes 1 damage. This gets +1 ATK for each damage on her.
+	},
+	&unitCard{
+		cost:      5,
+		name:      "Grounded Guide",
+		subtype:   "Thespian",
+		element:   ELEMENT_FINESSE,
+		techLevel: 2,
+		baseAtk:   4,
+		baseHP:    4,
+		// Your other units get +1 ATK. Your Virtuosos get +2/+1 instead.
+	},
+	&unitCard{
+		cost:      3,
+		name:      "Maestro",
+		subtype:   "Thespian",
+		element:   ELEMENT_FINESSE,
+		techLevel: 2,
+		baseAtk:   3,
+		baseHP:    5,
+		// Your Virtuosos cost 0 to play and gain "TAP: deal 2 damage to a building (target)"
+		// specials:     []unitSpecial{{name: "Frenzy", value: 1}},
+	},
+	&unitCard{
+		cost:      3,
+		name:      "Backstabber",
+		subtype:   "Rogue",
+		element:   ELEMENT_FINESSE,
+		techLevel: 2,
+		baseAtk:   3,
+		baseHP:    3,
+		specials:  []unitSpecial{{name: "Invisible"}},
+	},
+	&unitCard{
+		cost:      2,
+		name:      "Cloud Sprite",
+		subtype:   "Fairy",
+		element:   ELEMENT_FINESSE,
+		techLevel: 2,
+		baseAtk:   3,
+		baseHP:    2,
+		specials:  []unitSpecial{{name: "Flying"}},
+	},
+	&unitCard{
+		cost:      1,
+		name:      "Leaping Lizard",
+		subtype:   "Lizardman",
+		element:   ELEMENT_FINESSE,
+		techLevel: 2,
+		baseAtk:   3,
+		baseHP:    5,
+		specials:  []unitSpecial{{name: "Anti-air"}},
+	},
+	&unitCard{
+		cost:      6,
+		name:      "Blademaster",
+		subtype:   "Virtuoso",
+		element:   ELEMENT_FINESSE,
+		techLevel: 3,
+		baseAtk:   7,
+		baseHP:    5,
+		// your units and heroes have swift strike.
+	},
 }
