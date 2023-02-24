@@ -18,7 +18,7 @@ func (s *cardStack) removeThis(c card) {
 			return
 		}
 	}
-	panic("No card " + c.getName() + "in stack!")
+	panic("No card " + c.getName() + " in stack!")
 }
 
 func (s *cardStack) pushOnTop(c card) {

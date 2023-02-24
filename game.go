@@ -6,6 +6,8 @@ type game struct {
 	currentPlayerNumber int
 	currentTurn         int
 	currentPhase        int
+
+	messagesForPlayer string
 }
 
 func (g *game) initGame() {
@@ -60,9 +62,7 @@ func (g *game) endCurrentPhase() {
 		// don't end phase if a player has not taken their cards
 		(g.currentPlayer.isObligatedToAdd2Cards() && g.currentPlayer.cardsAddedFromCodexThisTurn < 2) {
 		// BUG: only one card can be added if the player is not obligated to take two.
-		if g.currentPlayer == pc.controlsPlayer { // TODO: remove this debug condition
-			return
-		}
+		return
 	}
 	g.currentPhase++
 	// end turn

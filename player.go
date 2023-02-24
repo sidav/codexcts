@@ -61,7 +61,7 @@ func (p *player) hasTechLevel(lvl int) bool {
 		return true
 	}
 	for _, b := range p.techBuildings {
-		if b.static.givesTech == lvl {
+		if b != nil && b.static.givesTech == lvl {
 			return true
 		}
 	}

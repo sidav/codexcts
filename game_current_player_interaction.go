@@ -1,5 +1,19 @@
 package main
 
+func (g *game) canPlayerPlayCard(p *player, c card) bool {
+	var can bool
+	switch c.(type) {
+	case *magicCard:
+		can = false // TODO: check for hero presence etc
+	case *unitCard:
+		can = p.hasTechLevel(c.(*unitCard).techLevel)
+	case *heroCard:
+		can = true
+		// TODO: check for heroes number etc
+	}
+	return can && p.gold >= c.getCost()
+}
+
 func (g *game) tryPlayCardAsWorker(c card) bool {
 	if g.currentPlayer.gold > 0 && !g.currentPlayer.hiredWorkerThisTurn {
 		g.currentPlayer.hand.removeThis(c)
@@ -12,7 +26,7 @@ func (g *game) tryPlayCardAsWorker(c card) bool {
 }
 
 func (g *game) tryPlayUnitCardFromHand(c card) bool {
-	if g.currentPlayer.gold >= c.getCost() {
+	if g.canPlayerPlayCard(g.currentPlayer, c) {
 		g.currentPlayer.otherZone = append(g.currentPlayer.otherZone, &unit{
 			card:   c,
 			tapped: false,
@@ -26,7 +40,7 @@ func (g *game) tryPlayUnitCardFromHand(c card) bool {
 }
 
 func (g *game) tryPlayHeroCard(c card) bool {
-	if g.currentPlayer.gold >= c.getCost() {
+	if g.canPlayerPlayCard(g.currentPlayer, c) {
 		g.currentPlayer.otherZone = append(g.currentPlayer.otherZone, &unit{
 			card:   c,
 			tapped: false,
