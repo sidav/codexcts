@@ -64,7 +64,7 @@ var sTableBuildings = []*buildingStatic{
 		maxHitpoints:    4,
 		requiresWorkers: 0,
 		givesTech:       0,
-		isAddon:         false,
+		isAddon:         true,
 	},
 	{
 		name:            "Surplus",
@@ -72,20 +72,20 @@ var sTableBuildings = []*buildingStatic{
 		maxHitpoints:    4,
 		requiresWorkers: 0,
 		givesTech:       0,
-		isAddon:         false,
+		isAddon:         true,
 	},
 	//{
 	//	name:            "Tech Lab",
 	//	maxHitpoints:    5,
 	//	requiresWorkers: 0,
 	//	givesTech:       0,
-	//	isAddon:         false,
+	//	isAddon:         true,
 	//},
 	//{
 	//	name:            "Heroes Hall",
 	//	maxHitpoints:    5,
 	//	requiresWorkers: 0,
 	//	givesTech:       0,
-	//	isAddon:         false,
+	//	isAddon:         true,
 	//},
 }

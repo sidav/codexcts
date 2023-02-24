@@ -43,7 +43,7 @@ func (ai *aiPlayerController) addWorker(g *game) {
 
 func (ai *aiPlayerController) tryPerformRandomAction(g *game) bool {
 	// TODO: build
-	actionToPerform := rnd.Rand(5)
+	actionToPerform := rnd.Rand(6)
 	switch {
 	case actionToPerform < 1:
 		return ai.tryPlayUnit(g)
@@ -53,6 +53,8 @@ func (ai *aiPlayerController) tryPerformRandomAction(g *game) bool {
 		return ai.tryMoveUnit(g)
 	case actionToPerform < 4:
 		return ai.tryBuild(g)
+	case actionToPerform < 5:
+		return ai.tryLevelUpHero(g)
 	default:
 		log.Println("I skipped an action.")
 		return true
@@ -115,14 +117,37 @@ func (ai *aiPlayerController) tryMoveUnit(g *game) bool {
 }
 
 func (ai *aiPlayerController) tryBuild(g *game) bool {
-	randBuilding := sTableBuildings[rnd.Rand(len(sTableBuildings))-1]
+	randBuilding := sTableBuildings[rnd.Rand(len(sTableBuildings))]
 	if g.canPlayerBuild(ai.controlsPlayer, randBuilding) {
+		log.Printf("I try to build %s.\n", randBuilding.name)
 		g.tryBuildBuildingForPlayer(ai.controlsPlayer, randBuilding)
 		log.Printf("I built %s.\n", randBuilding.name)
 		return true
 	}
 	log.Println("I can't build anything.")
 	return false
+}
+
+func (ai *aiPlayerController) tryLevelUpHero(g *game) bool {
+	var heroCandidates []*unit
+	for _, u := range ai.controlsPlayer.otherZone {
+		if u.isHero() {
+			heroCandidates = append(heroCandidates, u)
+		}
+	}
+	for _, u := range ai.controlsPlayer.patrolZone {
+		if u != nil && u.isHero() {
+			heroCandidates = append(heroCandidates, u)
+		}
+	}
+	if len(heroCandidates) > 0 {
+		hero := heroCandidates[rnd.Rand(len(heroCandidates))]
+		log.Printf("I try to level up %s.\n", hero.card.getName())
+		return g.tryLevelUpHero(ai.controlsPlayer, hero)
+	} else {
+		log.Println("I can't level up anything.")
+		return false
+	}
 }
 
 func (ai *aiPlayerController) actCodex(g *game) {
@@ -136,8 +161,8 @@ func (ai *aiPlayerController) actCodex(g *game) {
 		codexIndex = rnd.Rand(3)
 	}
 	indexOfCard := 99
-	for indexOfCard > plr.codices[codexIndex].getUniqueCardsCount() {
-		indexOfCard = rnd.Rand(plr.codices[codexIndex].getUniqueCardsCount())
+	for indexOfCard > plr.codices[codexIndex].getRemainingUniqueCardsCount() {
+		indexOfCard = rnd.Rand(plr.codices[codexIndex].getRemainingUniqueCardsCount())
 	}
 	cardToAdd := plr.codices[codexIndex].getCardByIndex(indexOfCard)
 	log.Printf("I add %s from my codex\n", cardToAdd.getName())
@@ -145,7 +170,7 @@ func (ai *aiPlayerController) actCodex(g *game) {
 }
 
 func (ai *aiPlayerController) logHand() {
-	log.Printf("I have $%d, My hand is: \n", ai.controlsPlayer.gold)
+	log.Printf("I have $%d and %d workers. My hand is: \n", ai.controlsPlayer.gold, ai.controlsPlayer.workers)
 	for _, c := range ai.controlsPlayer.hand {
 		log.Printf("   %s", c.getName())
 	}

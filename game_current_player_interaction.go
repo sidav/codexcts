@@ -105,7 +105,7 @@ func (g *game) tryBuildBuildingForPlayer(p *player, b *buildingStatic) bool {
 			isUnderConstruction: true,
 		}
 	} else {
-		p.techBuildings[b.givesTech] = &building{
+		p.techBuildings[b.givesTech-1] = &building{
 			static:              b,
 			currentHitpoints:    b.maxHitpoints,
 			isUnderConstruction: true,

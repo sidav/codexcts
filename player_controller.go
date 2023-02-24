@@ -189,6 +189,15 @@ func (pc *playerController) selectCardFromCodex(g *game) {
 		}
 		pc.phaseEnded = true
 		return
+	case "r": // select random card; needed for debug
+		index := rnd.Rand(len(pc.controlsPlayer.codices[pc.currentCodexPage].cards))
+		for pc.controlsPlayer.codices[pc.currentCodexPage].cardsCounts[index] == 0 {
+			index = rnd.Rand(len(pc.controlsPlayer.codices[pc.currentCodexPage].cards))
+		}
+		g.tryAddCardFromCodex(pc.controlsPlayer, pc.controlsPlayer.codices[pc.currentCodexPage].getCardByIndex(index), pc.currentCodexPage)
+		pc.currentSelectedCardFromHand = nil
+		pc.phaseEnded = true
+		return
 	case "LEFT":
 		pc.currentSelectedCardFromHand = nil
 		pc.currentCodexPage--

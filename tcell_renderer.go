@@ -100,7 +100,7 @@ func (r *tcellRenderer) renderHeader() {
 
 func (r *tcellRenderer) renderEnemyField() {
 	r.currUiLine = 1
-	r.renderOtherZone(r.enemy, 14, r.currUiLine)
+	r.renderOtherZone(r.enemy, 14, r.currUiLine, false)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.enemy.baseHealth), 0)
 	cw.ResetStyle()
@@ -125,7 +125,7 @@ func (r *tcellRenderer) renderEnemyField() {
 
 func (r *tcellRenderer) renderPlayerField() {
 	r.currUiLine = r.h / 2
-	r.renderOtherZone(r.activePlayer, 14, r.currUiLine)
+	r.renderOtherZone(r.activePlayer, 14, r.currUiLine, true)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
 	cw.ResetStyle()
@@ -179,13 +179,18 @@ func (r *tcellRenderer) renderSelectedUnit() {
 	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "L - level up"), r.w/2-cardFullW/2)
 }
 
-func (r *tcellRenderer) renderOtherZone(p *player, x, y int) {
-	const keys = "QWERT"
-	for i, c := range p.otherZone {
-		str := fmt.Sprintf("%s - %s",
-			string(keys[i]),
-			c.card.getName(),
-		)
+func (r *tcellRenderer) renderOtherZone(p *player, x, y int, renderSelectionStrings bool) {
+	cw.ResetStyle()
+	const keys = "QWERT     "
+	for i, unt := range p.otherZone {
+		str := "    "
+		if renderSelectionStrings {
+			str = string(keys[i]) + " - "
+		}
+		str += unt.card.getName()
+		if unt.isHero() {
+			str += fmt.Sprintf(" LVL %d", unt.level)
+		}
 		cw.PutString(str, x, y+i)
 	}
 }

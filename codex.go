@@ -5,7 +5,7 @@ type codex struct {
 	cardsCounts []int
 }
 
-func (cd *codex) getUniqueCardsCount() int {
+func (cd *codex) getRemainingUniqueCardsCount() int {
 	count := 0
 	for i := range cd.cards {
 		if cd.cardsCounts[i] > 0 {
