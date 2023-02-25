@@ -226,15 +226,35 @@ func (r *tcellRenderer) renderCodexSelection(p *player) {
 		cw.PutStringCenteredAt("Select a card", cardX+cardW/2, cardY+cardH/2)
 	}
 	r.currUiLine = wy + 1
-	for i := range p.codices[r.pc.currentCodexPage].cards {
-		if p.codices[r.pc.currentCodexPage].cardsCounts[i] > 0 {
+	codex := p.codices[r.pc.currentCodexPage]
+	cw.SetFg(tcell.ColorDarkMagenta)
+	r.drawLineAndIncrementY("MAGIC:", wx+3)
+	for i := range codex.cards {
+		thisCard := codex.getCardByIndex(i)
+		if codex.cardsCounts[i] > 0 {
 			cw.SetFg(tcell.ColorWhite)
 		} else {
 			cw.SetFg(tcell.ColorDarkGray)
 		}
 		r.drawLineAndIncrementY(fmt.Sprintf("%s - %-25s (x%d)", string(playerCodexCardSelectionKeys[i]),
-			p.codices[r.pc.currentCodexPage].getCardByIndex(i).getName(),
-			p.codices[r.pc.currentCodexPage].cardsCounts[i]), wx+1)
+			thisCard.getName(), codex.cardsCounts[i]), wx+1)
+		// draw separator line if neccessary
+		cw.SetFg(tcell.ColorDarkMagenta)
+		if i != len(codex.cards)-1 {
+			nextCard := codex.getCardByIndex(i + 1)
+			switch thisCard.(type) {
+			case *magicCard:
+				if _, ok := nextCard.(*unitCard); ok {
+					r.drawLineAndIncrementY(fmt.Sprintf("TECH %d UNITS:", nextCard.(*unitCard).techLevel), wx+3)
+				}
+			case *unitCard:
+				if _, ok := nextCard.(*unitCard); ok {
+					if nextCard.(*unitCard).techLevel != thisCard.(*unitCard).techLevel {
+						r.drawLineAndIncrementY(fmt.Sprintf("TECH %d UNITS:", nextCard.(*unitCard).techLevel), wx+3)
+					}
+				}
+			}
+		}
 	}
 }
 
