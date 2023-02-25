@@ -6,6 +6,10 @@ type aiPlayerController struct {
 	controlsPlayer *player
 }
 
+func (ai *aiPlayerController) phaseEnded() bool {
+	return true
+}
+
 func (ai *aiPlayerController) act(g *game) {
 	switch g.currentPhase {
 	case PHASE_MAIN:

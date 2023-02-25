@@ -30,8 +30,7 @@ type playerController struct {
 	selectedUnitIndex   int
 	currentCodexPage    int
 
-	exitGame   bool
-	phaseEnded bool
+	endPhase bool
 }
 
 func (pc *playerController) resetState() {
@@ -42,7 +41,12 @@ func (pc *playerController) resetState() {
 	pc.selectedUnitZone = 0
 }
 
+func (pc *playerController) phaseEnded() bool {
+	return pc.endPhase
+}
+
 func (pc *playerController) act(g *game) {
+	io.renderGame(g, g.currentPlayerNumber, pc)
 	switch g.currentPhase {
 	case PHASE_MAIN:
 		pc.mainPhase(g)
@@ -51,7 +55,7 @@ func (pc *playerController) act(g *game) {
 	default:
 		pc.resetState()
 		time.Sleep(200 * time.Millisecond)
-		pc.phaseEnded = true
+		pc.endPhase = true
 	}
 }
 
@@ -61,10 +65,10 @@ func (pc *playerController) mainPhase(g *game) {
 	case PCMODE_NONE:
 		switch key {
 		case "ESCAPE":
-			pc.exitGame = true
+			exitGame = true
 		case "ENTER":
 			pc.currentMode = PCMODE_NONE
-			pc.phaseEnded = true
+			pc.endPhase = true
 		}
 		// build
 		if key == "b" {
@@ -125,6 +129,10 @@ func (pc *playerController) mainPhase(g *game) {
 			if g.tryLevelUpHero(pc.controlsPlayer, pc.currentSelectedUnit) {
 				pc.currentMode = PCMODE_NONE
 			}
+		case "a":
+			if g.tryAttackAsUnit(pc.controlsPlayer, pc.currentSelectedUnit) {
+				pc.currentMode = PCMODE_NONE
+			}
 		}
 	case PCMODE_MOVE_SELECTED_UNIT:
 		switch key {
@@ -179,7 +187,7 @@ func (pc *playerController) selectCardFromCodex(g *game) {
 	key := readKey()
 	switch key {
 	case "ESCAPE":
-		pc.exitGame = true
+		exitGame = true
 		return
 	case "ENTER":
 		if pc.currentSelectedCardFromHand != nil {
@@ -187,7 +195,7 @@ func (pc *playerController) selectCardFromCodex(g *game) {
 				pc.currentSelectedCardFromHand = nil
 			}
 		}
-		pc.phaseEnded = true
+		pc.endPhase = true
 		return
 	case "r": // select random card; needed for debug
 		index := rnd.Rand(len(pc.controlsPlayer.codices[pc.currentCodexPage].cards))
@@ -196,7 +204,7 @@ func (pc *playerController) selectCardFromCodex(g *game) {
 		}
 		g.tryAddCardFromCodex(pc.controlsPlayer, pc.controlsPlayer.codices[pc.currentCodexPage].getCardByIndex(index), pc.currentCodexPage)
 		pc.currentSelectedCardFromHand = nil
-		pc.phaseEnded = true
+		pc.endPhase = true
 		return
 	case "LEFT":
 		pc.currentSelectedCardFromHand = nil

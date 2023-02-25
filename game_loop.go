@@ -1,17 +1,15 @@
 package main
 
 func gameLoop(g *game) {
-	io.renderGame(g, 0, pc)
-	for !pc.exitGame {
+	for !exitGame {
 		g.performCurrentPhase()
-		for !pc.exitGame && g.currentPlayer == pc.controlsPlayer && !pc.phaseEnded {
-			io.renderGame(g, g.currentPlayerNumber, pc)
+		pc := g.playersControllers[g.currentPlayerNumber]
+		for !exitGame {
 			pc.act(g)
+			if pc.phaseEnded() {
+				break
+			}
 		}
-		if g.currentPlayer == aiPc.controlsPlayer {
-			aiPc.act(g)
-		}
-		pc.phaseEnded = false
 		g.endCurrentPhase()
 	}
 }

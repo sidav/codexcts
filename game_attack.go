@@ -25,7 +25,7 @@ func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*play
 	return list
 }
 
-func (g *game) tryAttackAsUnit(attacker *unit, owner *player) bool {
+func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
 	if attacker.tapped {
 		return false
 	}

@@ -23,6 +23,7 @@ type tcellRenderer struct {
 }
 
 func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerController) {
+	r.pc = pc
 	r.g = g
 	r.activePlayer = g.players[renderForPlayerNum]
 	r.enemy = g.players[(renderForPlayerNum+1)%2]
@@ -43,7 +44,7 @@ func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerCo
 }
 
 func (r *tcellRenderer) renderPcmodeSpecific() {
-	switch pc.currentMode {
+	switch r.pc.currentMode {
 	case PCMODE_NONE:
 	case PCMODE_CARD_FROM_HAND_SELECTED:
 		r.renderSelectedCardFromHand()
@@ -51,7 +52,7 @@ func (r *tcellRenderer) renderPcmodeSpecific() {
 		r.renderSelectedUnit()
 	case PCMODE_MOVE_SELECTED_UNIT:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
-		r.drawFilledInfoRect(fmt.Sprintf("Where to move %s?", pc.currentSelectedUnit.card.getName()), r.w/2, r.h-cardShortH)
+		r.drawFilledInfoRect(fmt.Sprintf("Where to move %s?", r.pc.currentSelectedUnit.card.getName()), r.w/2, r.h-cardShortH)
 	case PCMODE_SELECT_BUILDING:
 		r.renderSelectBuildingMenu()
 	case PCMODE_SELECT_HERO_TO_PLAY:
@@ -162,7 +163,7 @@ func (r *tcellRenderer) renderHand() {
 }
 
 func (r *tcellRenderer) renderSelectedCardFromHand() {
-	r.renderCardFull(pc.currentSelectedCardFromHand, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
+	r.renderCardFull(r.pc.currentSelectedCardFromHand, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
 	r.currUiLine = r.h/2 + cardFullH/2 + 1
 	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "W - spend as worker"), r.w/2-cardFullW/2)
@@ -170,7 +171,7 @@ func (r *tcellRenderer) renderSelectedCardFromHand() {
 }
 
 func (r *tcellRenderer) renderSelectedUnit() {
-	r.renderCardFull(pc.currentSelectedUnit.card, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
+	r.renderCardFull(r.pc.currentSelectedUnit.card, r.w/2-cardFullW/2, r.h/2-cardFullH/2, cardFullW, cardFullH)
 	r.currUiLine = r.h/2 + cardFullH/2 + 1
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
 	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "M - move to other zone"), r.w/2-cardFullW/2)
@@ -214,8 +215,8 @@ func (r *tcellRenderer) renderCodexSelection(p *player) {
 	cardW, cardH := 2*ww/5, wh-2
 	cardX, cardY := wx+ww-cardW, wy+1
 	r.drawWindow("SELECT CARDS FROM YOUR CODEX", wx, wy, ww, wh, tcell.ColorBlue)
-	if pc.currentSelectedCardFromHand != nil {
-		r.renderCardFull(pc.currentSelectedCardFromHand, cardX, cardY, cardW, cardH)
+	if r.pc.currentSelectedCardFromHand != nil {
+		r.renderCardFull(r.pc.currentSelectedCardFromHand, cardX, cardY, cardW, cardH)
 	} else {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
 		cw.DrawRect(cardX, cardY, 0, cardH)
@@ -223,14 +224,15 @@ func (r *tcellRenderer) renderCodexSelection(p *player) {
 		cw.PutStringCenteredAt("Select a card", cardX+cardW/2, cardY+cardH/2)
 	}
 	r.currUiLine = wy + 1
-	for i := range p.codices[pc.currentCodexPage].cards {
-		if p.codices[pc.currentCodexPage].cardsCounts[i] > 0 {
+	for i := range p.codices[r.pc.currentCodexPage].cards {
+		if p.codices[r.pc.currentCodexPage].cardsCounts[i] > 0 {
 			cw.SetFg(tcell.ColorWhite)
 		} else {
 			cw.SetFg(tcell.ColorDarkGray)
 		}
 		r.drawLineAndIncrementY(fmt.Sprintf("%s - %-25s (x%d)", string(playerCodexCardSelectionKeys[i]),
-			p.codices[pc.currentCodexPage].getCardByIndex(i).getName(), p.codices[pc.currentCodexPage].cardsCounts[i]), wx+1)
+			p.codices[r.pc.currentCodexPage].getCardByIndex(i).getName(),
+			p.codices[r.pc.currentCodexPage].cardsCounts[i]), wx+1)
 	}
 }
 

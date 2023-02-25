@@ -9,9 +9,8 @@ import (
 )
 
 var (
-	rnd  random.PRNG
-	pc   *playerController
-	aiPc *aiPlayerController
+	exitGame bool
+	rnd      random.PRNG
 )
 
 func main() {
@@ -31,14 +30,14 @@ func main() {
 	rnd = pcgrandom.New(-1)
 	g := &game{}
 	g.initGame()
-	pc = &playerController{
+	g.playersControllers = append(g.playersControllers, &playerController{
 		controlsPlayer:              g.players[0],
 		currentMode:                 PCMODE_NONE,
 		currentSelectedCardFromHand: nil,
 		currentSelectedUnit:         nil,
-	}
-	aiPc = &aiPlayerController{
+	})
+	g.playersControllers = append(g.playersControllers, &aiPlayerController{
 		controlsPlayer: g.players[1],
-	}
+	})
 	gameLoop(g)
 }
