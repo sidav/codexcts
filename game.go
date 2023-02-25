@@ -9,7 +9,7 @@ type game struct {
 	currentTurn         int
 	currentPhase        int
 
-	messagesForPlayer string
+	messageForPlayer string
 }
 
 func (g *game) initGame() {

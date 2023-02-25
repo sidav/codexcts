@@ -99,7 +99,7 @@ func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
 	}
 	cw.DrawFilledRect(' ', x, y, w, h)
-	cw.PutTextInRect(u.card.getName(), x+1, y, w-2)
+	cw.PutTextInRect(u.getName(), x+1, y, w-2)
 	atk, hp := u.getAtkHp()
 	if u.isHero() {
 		cw.PutStringCenteredAt(fmt.Sprintf("LEVEL %d", u.level), x+w/2, y+h-2)

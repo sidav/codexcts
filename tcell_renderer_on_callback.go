@@ -5,6 +5,15 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+func (r *tcellRenderer) showMessageWindow(title string, msg string) {
+	ww, wh := r.w/2, 5*r.h/6
+	wx, wy := r.w/2-ww/2, r.h/2-wh/2
+	r.drawWindow(title, wx, wy, ww, wh, tcell.ColorBlue)
+	cw.ResetStyle()
+	cw.PutTextInRect(msg, wx+1, wy+1, ww-2)
+	cw.FlushScreen()
+}
+
 func (r *tcellRenderer) renderAttackSelection() {
 	length := len(r.pc.callbackCoordsList)
 	ww, wh := r.w/3, length+5
@@ -45,7 +54,7 @@ func (r *tcellRenderer) renderAttackSelection() {
 		if unt != nil {
 			untAtk, untHp := unt.getAtkHp()
 			selectionString = fmt.Sprintf("%s - %d/%d %s", string(coordsSelectableWithCallback[index]),
-				untAtk, untHp, unt.card.getName())
+				untAtk, untHp, unt.getName())
 		}
 		// separator
 		if zoneString != prevZoneString {

@@ -119,7 +119,7 @@ func (ai *aiPlayerController) tryMoveUnit(g *game) bool {
 			break
 		}
 	}
-	log.Printf("I moved %s to other zone.\n", unitToMove.card.getName())
+	log.Printf("I moved %s to other zone.\n", unitToMove.getName())
 	return true
 }
 
@@ -149,7 +149,7 @@ func (ai *aiPlayerController) tryLevelUpHero(g *game) bool {
 	}
 	if len(heroCandidates) > 0 {
 		hero := heroCandidates[rnd.Rand(len(heroCandidates))]
-		log.Printf("I try to level up %s.\n", hero.card.getName())
+		log.Printf("I try to level up %s.\n", hero.getName())
 		return g.tryLevelUpHero(ai.controlsPlayer, hero)
 	} else {
 		log.Println("I can't level up anything.")
@@ -169,7 +169,7 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 		return false
 	} else {
 		attacker := candidates[rnd.Rand(len(candidates))]
-		log.Printf("I attack with %s.", attacker.card.getName())
+		log.Printf("I attack with %s.", attacker.getName())
 		return g.tryAttackAsUnit(ai.controlsPlayer, attacker)
 	}
 }

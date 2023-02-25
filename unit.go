@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // unit is "card on the battlefield", as opposed to "card in deck"
 type unit struct {
 	card             card
@@ -7,6 +9,15 @@ type unit struct {
 	attackedThisTurn bool // for units with Readiness, "tapped" is not enough
 	wounds           int
 	level            int // needed only for heroes
+}
+
+func (u *unit) getName() string {
+	return u.card.getName()
+}
+
+func (u *unit) getNameWithStats() string {
+	a, h := u.getAtkHp()
+	return fmt.Sprintf("%d/%d %s", a, h, u.card.getName())
 }
 
 func (u *unit) isHero() bool {

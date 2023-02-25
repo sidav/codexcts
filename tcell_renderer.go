@@ -52,7 +52,7 @@ func (r *tcellRenderer) renderPcmodeSpecific() {
 		r.renderSelectedUnit()
 	case PCMODE_MOVE_SELECTED_UNIT:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
-		r.drawFilledInfoRect(fmt.Sprintf("Where to move %s?", r.pc.currentSelectedUnit.card.getName()), r.w/2, r.h-cardShortH)
+		r.drawFilledInfoRect(fmt.Sprintf("Where to move %s?", r.pc.currentSelectedUnit.getName()), r.w/2, r.h-cardShortH)
 	case PCMODE_SELECT_BUILDING:
 		r.renderSelectBuildingMenu()
 	case PCMODE_SELECT_HERO_TO_PLAY:
@@ -199,7 +199,7 @@ func (r *tcellRenderer) renderOtherZone(p *player, x, y int, renderSelectionStri
 		if renderSelectionStrings {
 			str = string(keys[i]) + " - "
 		}
-		str += fmt.Sprintf("%d/%d %s", a, d, unt.card.getName())
+		str += fmt.Sprintf("%d/%d %s", a, d, unt.getName())
 		cw.ResetStyle()
 		if unt.tapped {
 			cw.SetFg(tcell.ColorDarkBlue)

@@ -19,3 +19,9 @@ func (pc *playerController) selectCoordsFromListCallback(message string, coords 
 		}
 	}
 }
+
+func (pc *playerController) showMessage(title, msg string) {
+	io.showMessageWindow(title, msg)
+	for readKey() != "ENTER" {
+	}
+}
