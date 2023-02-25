@@ -53,7 +53,7 @@ func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
 			"Select the target of the attack", coords)
 	}
 	g.messageForPlayer += fmt.Sprintf("Target coords: %s. \n ", selectedCoords.getFormattedName())
-	g.performAttack(attacker, owner, selectedCoords)
+	g.resolveAttack(attacker, owner, selectedCoords)
 	g.removeDeadUnits()
 	attacker.tapped = true
 	for _, contr := range g.playersControllers {
@@ -62,7 +62,7 @@ func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
 	return true
 }
 
-func (g *game) performAttack(attacker *unit, attackingPlayer *player, targetCoords *playerZoneCoords) {
+func (g *game) resolveAttack(attacker *unit, attackingPlayer *player, targetCoords *playerZoneCoords) {
 	atk, _ := attacker.getAtkHp()
 	defendingPlayer := targetCoords.player
 	var targetUnit *unit
@@ -120,6 +120,11 @@ func (g *game) performAttack(attacker *unit, attackingPlayer *player, targetCoor
 	// dealing the damage to unit
 	if targetUnit != nil {
 		g.messageForPlayer += fmt.Sprintf("Attacker: %s \n ", attacker.getNameWithStats())
+		if attacker.hasPassiveAbility(UPA_FRENZY) {
+			inc := attacker.getPassiveAbilityValue(UPA_FRENZY)
+			g.messageForPlayer += fmt.Sprintf("  Attacker has Frenzy %d (+%d ATK) \n ", inc, inc)
+			atk += inc
+		}
 		g.messageForPlayer += fmt.Sprintf("Defender: %s \n ", targetUnit.getNameWithStats())
 		atk -= targetArmorBonus
 		backAtk, _ := targetUnit.getAtkHp()

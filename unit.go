@@ -59,3 +59,24 @@ func (u *unit) hasPassiveAbility(code unitPassiveAbilityCode) bool {
 	}
 	return false
 }
+
+func (u *unit) getPassiveAbilityValue(code unitPassiveAbilityCode) int {
+	sum := 0
+	switch u.card.(type) {
+	case *unitCard:
+		uc := u.card.(*unitCard)
+		for i := range uc.passiveAbilities {
+			if uc.passiveAbilities[i].code == code {
+				sum += uc.passiveAbilities[i].value
+			}
+		}
+	case *heroCard:
+		hc := u.card.(*heroCard)
+		for i := range hc.levelsPassiveAbilities {
+			if u.level >= hc.levelsPassiveAbilities[i].availableFromLevel && hc.levelsPassiveAbilities[i].code == code {
+				sum += hc.levelsPassiveAbilities[i].value
+			}
+		}
+	}
+	return sum
+}

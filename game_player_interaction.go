@@ -66,6 +66,12 @@ func (g *game) tryLevelUpHero(p *player, unit *unit) bool {
 		if p.gold > 0 && unit.card.(*heroCard).getMaxLevel() > unit.level {
 			p.gold--
 			unit.level++
+			// heal hero on a threshold
+			for _, lad := range unit.card.(*heroCard).levelsAttDef {
+				if lad[0] == unit.level {
+					unit.wounds = 0
+				}
+			}
 			return true
 		}
 	}

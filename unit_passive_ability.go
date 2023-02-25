@@ -16,14 +16,14 @@ func (us *unitPassiveAbility) getFormattedName() string {
 	switch us.code {
 	case UPA_HASTE:
 		name = "Haste"
-	case UPA_HEALING:
-		name = "Healing"
+	//case UPA_HEALING:
+	//	name = "Healing"
 	case UPA_READINESS:
 		name = "Readiness"
 	//case UPA_FLYING:
 	//	name = "Flying"
-	//case UPA_FRENZY:
-	//	name = "Frenzy"
+	case UPA_FRENZY:
+		name = "Frenzy"
 	//case UPA_SPARKSHOT:
 	//	name = "Sparkshot"
 	//case UPA_ANTI_AIR:
