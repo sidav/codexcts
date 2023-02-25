@@ -1,6 +1,8 @@
 package main
 
 type player struct {
+	name string
+
 	hand    cardStack
 	draw    cardStack
 	discard cardStack

@@ -36,8 +36,10 @@ func main() {
 		currentSelectedCardFromHand: nil,
 		currentSelectedUnit:         nil,
 	})
+	g.players[0].name = "Player"
 	g.playersControllers = append(g.playersControllers, &aiPlayerController{
 		controlsPlayer: g.players[1],
 	})
+	g.players[1].name = "AI"
 	gameLoop(g)
 }

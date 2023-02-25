@@ -1,5 +1,9 @@
 package main
 
+func (g *game) canUnitAttack(u *unit) bool {
+	return !u.tapped
+}
+
 func (g *game) canPlayerPlayCard(p *player, c card) bool {
 	var can bool
 	switch c.(type) {
