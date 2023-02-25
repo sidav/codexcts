@@ -181,9 +181,13 @@ func (r *tcellRenderer) renderSelectedUnit() {
 	r.currUiLine = r.h/2 + cardFullH/2 + 1
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorBlue)
 	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "M - move to other zone"), r.w/2-cardFullW/2)
-	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "A - attack"), r.w/2-cardFullW/2)
-	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "U - use ability"), r.w/2-cardFullW/2)
-	r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "L - level up"), r.w/2-cardFullW/2)
+	if r.g.canUnitAttack(r.pc.currentSelectedUnit) {
+		r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "A - attack"), r.w/2-cardFullW/2)
+	}
+	// r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "U - use ability"), r.w/2-cardFullW/2)
+	if r.pc.currentSelectedUnit.isHero() {
+		r.drawLineAndIncrementY(fmt.Sprintf(" %-30s", "L - level up"), r.w/2-cardFullW/2)
+	}
 }
 
 func (r *tcellRenderer) renderOtherZone(p *player, x, y int, renderSelectionStrings bool) {
