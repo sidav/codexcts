@@ -154,3 +154,12 @@ func (g *game) discardPhase() {
 	}
 	p.sortHand()
 }
+
+func (g *game) getEnemyForPlayer(p *player) *player {
+	for i := range g.players {
+		if g.players[i] != p {
+			return p
+		}
+	}
+	panic("Waaat")
+}

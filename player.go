@@ -91,8 +91,3 @@ func (p *player) addDiscardIntoDraw() {
 func (p *player) isObligatedToAdd2Cards() bool {
 	return p.workers < 10
 }
-
-const (
-	PLAYERZONE_OTHER = iota
-	PLAYERZONE_PATROL
-)
