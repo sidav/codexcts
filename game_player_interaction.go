@@ -14,9 +14,10 @@ func (g *game) tryPlayCardAsWorker(c card) bool {
 func (g *game) tryPlayUnitCardFromHand(c card) bool {
 	if g.canPlayerPlayCard(g.currentPlayer, c) {
 		g.currentPlayer.otherZone = append(g.currentPlayer.otherZone, &unit{
-			card:   c,
-			tapped: false,
-			wounds: 0,
+			card:             c,
+			tapped:           false,
+			attackedThisTurn: true, // so that it can't attack just now
+			wounds:           0,
 		})
 		g.currentPlayer.hand.removeThis(c)
 		g.currentPlayer.gold -= c.getCost()
@@ -28,10 +29,11 @@ func (g *game) tryPlayUnitCardFromHand(c card) bool {
 func (g *game) tryPlayHeroCard(c card) bool {
 	if g.canPlayerPlayCard(g.currentPlayer, c) {
 		g.currentPlayer.otherZone = append(g.currentPlayer.otherZone, &unit{
-			card:   c,
-			tapped: false,
-			wounds: 0,
-			level:  1,
+			card:             c,
+			tapped:           false,
+			attackedThisTurn: true, // so that it can't attack just now
+			wounds:           0,
+			level:            1,
 		})
 		g.currentPlayer.gold -= c.getCost()
 		for i, h := range g.currentPlayer.commandZone {

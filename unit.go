@@ -2,10 +2,11 @@ package main
 
 // unit is "card on the battlefield", as opposed to "card in deck"
 type unit struct {
-	card   card
-	tapped bool
-	wounds int
-	level  int // needed only for heroes
+	card             card
+	tapped           bool // "exhausted" in rules
+	attackedThisTurn bool // for units with Readiness, "tapped" is not enough
+	wounds           int
+	level            int // needed only for heroes
 }
 
 func (u *unit) isHero() bool {

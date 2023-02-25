@@ -31,7 +31,7 @@ func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*play
 }
 
 func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
-	if attacker.tapped {
+	if !g.canUnitAttack(attacker) {
 		return false
 	}
 	coords := g.getAttackableCoordsForUnit(attacker, owner)
@@ -46,18 +46,25 @@ func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
 			"Select the target of the attack", coords)
 	}
 	g.performAttack(attacker, owner, selectedCoords)
+	g.removeDeadUnits()
+	attacker.tapped = true
 	return true
 }
 
 func (g *game) performAttack(attacker *unit, attackerOwner *player, targetCoords *playerZoneCoords) {
 	atk, _ := attacker.getAtkHp()
 	targetOwner := targetCoords.player
+	var targetUnit *unit
+	targetIndex := targetCoords.indexInZone
+	targetArmorBonus := 0
+	targetAttackBonus := 0
+
 	switch targetCoords.zone {
 	case PLAYERZONE_MAIN_BASE:
 		targetOwner.baseHealth -= atk
 	case PLAYERZONE_TECH_BUILDINGS:
-		targetOwner.techBuildings[targetCoords.indexInZone].currentHitpoints -= atk
-		if targetOwner.techBuildings[targetCoords.indexInZone].currentHitpoints <= 0 {
+		targetOwner.techBuildings[targetIndex].currentHitpoints -= atk
+		if targetOwner.techBuildings[targetIndex].currentHitpoints <= 0 {
 			targetOwner.baseHealth -= 2
 		}
 	case PLAYERZONE_ADDON_BUILDING:
@@ -66,12 +73,68 @@ func (g *game) performAttack(attacker *unit, attackerOwner *player, targetCoords
 			targetOwner.baseHealth -= 2
 		}
 	case PLAYERZONE_OTHER:
-		target := targetOwner.otherZone[targetCoords.indexInZone]
-		target.wounds += atk
+		targetUnit = targetOwner.otherZone[targetIndex]
 	case PLAYERZONE_PATROL:
-		target := targetOwner.patrolZone[targetCoords.indexInZone]
-		backAtk, _ := target.getAtkHp()
-		target.wounds += atk
-		attacker.wounds += backAtk
+		targetUnit = targetOwner.patrolZone[targetIndex]
+		switch targetIndex {
+		case 0:
+			targetArmorBonus++
+		case 1:
+			targetAttackBonus++
+		}
+	}
+	// dealing the damage to unit
+	if targetUnit != nil {
+		backAtk, _ := targetUnit.getAtkHp()
+		targetUnit.wounds += atk - targetArmorBonus
+		attacker.wounds += backAtk + targetAttackBonus
+	}
+}
+
+func (g *game) removeDeadUnits() {
+	for _, p := range g.players {
+		for ind := len(p.otherZone) - 1; ind >= 0; ind-- {
+			unt := p.otherZone[ind]
+			_, hp := unt.getAtkHp()
+			if unt.wounds >= hp {
+				if unt.isHero() {
+					for heroInd := range p.commandZone {
+						if p.commandZone[heroInd] == nil {
+							p.commandZone[heroInd] = unt.card.(*heroCard)
+							break
+						}
+					}
+				} else {
+					p.discard.addToBottom(unt.card)
+				}
+				p.otherZone = append(p.otherZone[:ind], p.otherZone[ind+1:]...)
+			}
+		}
+		for ind := range p.patrolZone {
+			unt := p.patrolZone[ind]
+			if unt == nil {
+				continue
+			}
+			_, hp := unt.getAtkHp()
+			if unt.wounds >= hp {
+				if unt.isHero() {
+					for heroInd := range p.commandZone {
+						if p.commandZone[heroInd] == nil {
+							p.commandZone[heroInd] = unt.card.(*heroCard)
+							break
+						}
+					}
+				} else {
+					p.discard.addToBottom(unt.card)
+				}
+				p.patrolZone[ind] = nil
+				switch ind {
+				case 2:
+					p.gold++
+				case 3:
+					p.drawCard()
+				}
+			}
+		}
 	}
 }

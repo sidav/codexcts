@@ -27,7 +27,7 @@ func (ch *heroCard) isInStartingDeck() bool {
 }
 
 func (ch *heroCard) getFormattedName() string {
-	return fmt.Sprintf("(%d) %-25s", ch.cost, ch.name)
+	return fmt.Sprintf("%d %-15s", ch.cost, ch.name)
 }
 
 func (ch *heroCard) getCost() int {

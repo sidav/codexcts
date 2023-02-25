@@ -116,11 +116,13 @@ func (g *game) untapPhase() {
 	for _, u := range g.currentPlayer.patrolZone {
 		if u != nil {
 			u.tapped = false
+			u.attackedThisTurn = false
 		}
 	}
 	for _, u := range g.currentPlayer.otherZone {
 		if u != nil {
 			u.tapped = false
+			u.attackedThisTurn = false
 		}
 	}
 }

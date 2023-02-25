@@ -1,7 +1,7 @@
 package main
 
 func (g *game) canUnitAttack(u *unit) bool {
-	return !u.tapped
+	return !(u.tapped || u.attackedThisTurn)
 }
 
 func (g *game) canPlayerPlayCard(p *player, c card) bool {
