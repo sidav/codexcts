@@ -193,7 +193,11 @@ func (r *tcellRenderer) renderOtherZone(p *player, x, y int, renderSelectionStri
 			str = string(keys[i]) + " - "
 		}
 		str += fmt.Sprintf("%d/%d %s", a, d, unt.card.getName())
-		if unt.isHero() {
+		cw.ResetStyle()
+		if unt.tapped {
+			cw.SetFg(tcell.ColorDarkBlue)
+			str += " TAPPED"
+		} else if unt.isHero() {
 			str += fmt.Sprintf(" LVL %d", unt.level)
 		}
 		cw.PutString(str, x, y+i)

@@ -7,12 +7,14 @@ type building struct {
 }
 
 type buildingStatic struct {
-	name            string
-	cost            int
-	maxHitpoints    int
-	requiresWorkers int
-	givesTech       int
-	isAddon         bool
+	name             string
+	cost             int
+	maxHitpoints     int
+	requiresWorkers  int
+	givesTech        int
+	isAddon          bool
+	damagesAttackers bool
+	givesOneMoreDraw bool
 }
 
 func getBuildingStaticByName(name string) *buildingStatic {
@@ -59,20 +61,22 @@ var sTableBuildings = []*buildingStatic{
 		isAddon:         false,
 	},
 	{
-		name:            "Tower",
-		cost:            3,
-		maxHitpoints:    4,
-		requiresWorkers: 0,
-		givesTech:       0,
-		isAddon:         true,
+		name:             "Tower",
+		cost:             3,
+		maxHitpoints:     4,
+		requiresWorkers:  0,
+		givesTech:        0,
+		isAddon:          true,
+		damagesAttackers: true,
 	},
 	{
-		name:            "Surplus",
-		cost:            5,
-		maxHitpoints:    4,
-		requiresWorkers: 0,
-		givesTech:       0,
-		isAddon:         true,
+		name:             "Surplus",
+		cost:             5,
+		maxHitpoints:     4,
+		requiresWorkers:  0,
+		givesTech:        0,
+		isAddon:          true,
+		givesOneMoreDraw: true,
 	},
 	//{
 	//	name:            "Tech Lab",

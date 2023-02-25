@@ -128,14 +128,18 @@ func (g *game) untapPhase() {
 }
 
 func (g *game) upkeepPhase() {
-	g.currentPlayer.gold += g.currentPlayer.workers
-	if g.currentPlayer.addonBuilding != nil && g.currentPlayer.addonBuilding.isUnderConstruction {
-		g.currentPlayer.addonBuilding.isUnderConstruction = false
+	plr := g.currentPlayer
+	plr.gold += plr.workers
+	if plr.addonBuilding != nil && plr.addonBuilding.isUnderConstruction {
+		plr.addonBuilding.isUnderConstruction = false
 	}
-	for _, tb := range g.currentPlayer.techBuildings {
+	for _, tb := range plr.techBuildings {
 		if tb != nil && tb.isUnderConstruction {
 			tb.isUnderConstruction = false
 		}
+	}
+	if plr.addonBuilding.static.givesOneMoreDraw {
+		plr.drawCard()
 	}
 }
 

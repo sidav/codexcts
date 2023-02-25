@@ -5,13 +5,17 @@ func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*play
 	if enemy.patrolZone[0] != nil {
 		return []*playerZoneCoords{{enemy, PLAYERZONE_PATROL, 0}}
 	}
+	onlyPatrolZone := false
 	list := make([]*playerZoneCoords, 0)
 	for i, p := range enemy.patrolZone {
 		if p != nil {
 			list = append(list, &playerZoneCoords{enemy, PLAYERZONE_PATROL, i})
+			if !p.tapped {
+				onlyPatrolZone = true
+			}
 		}
 	}
-	if len(list) == 0 { // patrol zone empty, adding everything the player has
+	if onlyPatrolZone { // patrol zone empty, adding everything the player has
 		list = append(list, &playerZoneCoords{enemy, PLAYERZONE_MAIN_BASE, 0})
 		for i, t := range enemy.techBuildings {
 			if t != nil {
@@ -51,9 +55,9 @@ func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
 	return true
 }
 
-func (g *game) performAttack(attacker *unit, attackerOwner *player, targetCoords *playerZoneCoords) {
+func (g *game) performAttack(attacker *unit, attackingPlayer *player, targetCoords *playerZoneCoords) {
 	atk, _ := attacker.getAtkHp()
-	targetOwner := targetCoords.player
+	defendingPlayer := targetCoords.player
 	var targetUnit *unit
 	targetIndex := targetCoords.indexInZone
 	targetArmorBonus := 0
@@ -61,21 +65,21 @@ func (g *game) performAttack(attacker *unit, attackerOwner *player, targetCoords
 
 	switch targetCoords.zone {
 	case PLAYERZONE_MAIN_BASE:
-		targetOwner.baseHealth -= atk
+		defendingPlayer.baseHealth -= atk
 	case PLAYERZONE_TECH_BUILDINGS:
-		targetOwner.techBuildings[targetIndex].currentHitpoints -= atk
-		if targetOwner.techBuildings[targetIndex].currentHitpoints <= 0 {
-			targetOwner.baseHealth -= 2
+		defendingPlayer.techBuildings[targetIndex].currentHitpoints -= atk
+		if defendingPlayer.techBuildings[targetIndex].currentHitpoints <= 0 {
+			defendingPlayer.baseHealth -= 2
 		}
 	case PLAYERZONE_ADDON_BUILDING:
-		targetOwner.addonBuilding.currentHitpoints -= atk
-		if targetOwner.addonBuilding.currentHitpoints <= 0 {
-			targetOwner.baseHealth -= 2
+		defendingPlayer.addonBuilding.currentHitpoints -= atk
+		if defendingPlayer.addonBuilding.currentHitpoints <= 0 {
+			defendingPlayer.baseHealth -= 2
 		}
 	case PLAYERZONE_OTHER:
-		targetUnit = targetOwner.otherZone[targetIndex]
+		targetUnit = defendingPlayer.otherZone[targetIndex]
 	case PLAYERZONE_PATROL:
-		targetUnit = targetOwner.patrolZone[targetIndex]
+		targetUnit = defendingPlayer.patrolZone[targetIndex]
 		switch targetIndex {
 		case 0:
 			targetArmorBonus++
@@ -88,6 +92,9 @@ func (g *game) performAttack(attacker *unit, attackerOwner *player, targetCoords
 		backAtk, _ := targetUnit.getAtkHp()
 		targetUnit.wounds += atk - targetArmorBonus
 		attacker.wounds += backAtk + targetAttackBonus
+	}
+	if defendingPlayer.addonBuilding != nil && defendingPlayer.addonBuilding.static.damagesAttackers {
+		attacker.wounds++
 	}
 }
 

@@ -93,12 +93,19 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 }
 
 func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
-	cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
+	if u.tapped {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkBlue)
+	} else {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
+	}
 	cw.DrawFilledRect(' ', x, y, w, h)
 	cw.PutTextInRect(u.card.getName(), x+1, y, w-2)
 	atk, hp := u.getAtkHp()
 	if u.isHero() {
 		cw.PutStringCenteredAt(fmt.Sprintf("LEVEL %d", u.level), x+w/2, y+h-2)
+	}
+	if u.tapped {
+		cw.PutStringCenteredAt("TAPPED", x+w/2, y+h-2)
 	}
 	cw.PutStringCenteredAt(fmt.Sprintf("%d/%d", atk, hp), x+w/2, y+h-1)
 }
