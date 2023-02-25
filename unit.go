@@ -28,3 +28,23 @@ func (u *unit) getAtkHp() (int, int) {
 	}
 	return -99, -99
 }
+
+func (u *unit) hasPassiveAbility(code unitPassiveAbilityCode) bool {
+	switch u.card.(type) {
+	case *unitCard:
+		uc := u.card.(*unitCard)
+		for i := range uc.passiveAbilities {
+			if uc.passiveAbilities[i].code == code {
+				return true
+			}
+		}
+	case *heroCard:
+		hc := u.card.(*heroCard)
+		for i := range hc.levelsPassiveAbilities {
+			if u.level >= hc.levelsPassiveAbilities[i].availableFromLevel && hc.levelsPassiveAbilities[i].code == code {
+				return true
+			}
+		}
+	}
+	return false
+}

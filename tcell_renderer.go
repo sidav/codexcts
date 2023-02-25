@@ -141,6 +141,9 @@ func (r *tcellRenderer) renderPlayerField() {
 			r.drawLineAndIncrementY(line, 0)
 		}
 	}
+	if r.activePlayer.addonBuilding != nil {
+		r.drawLineAndIncrementY(r.activePlayer.addonBuilding.static.name, 0)
+	}
 	r.drawLineAndIncrementY("(B)build", 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DRAW: %4d", len(r.activePlayer.draw)), 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DISCARD: %d", len(r.activePlayer.discard)), 0)

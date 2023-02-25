@@ -3,15 +3,15 @@ package main
 import "fmt"
 
 type unitCard struct {
-	cost         int
-	name         string
-	subtype      string
-	element      element
-	techLevel    int
-	baseAtk      int
-	baseHP       int
-	specials     []unitSpecial
-	startingDeck bool
+	cost             int
+	name             string
+	subtype          string
+	element          element
+	techLevel        int
+	baseAtk          int
+	baseHP           int
+	passiveAbilities []unitPassiveAbility
+	startingDeck     bool
 }
 
 func (uc *unitCard) getName() string {
@@ -36,13 +36,4 @@ func (uc *unitCard) isInStartingDeck() bool {
 
 func (uc *unitCard) getElement() element {
 	return uc.element
-}
-
-func (uc *unitCard) hasSpecial(s string) bool {
-	for i := range uc.specials {
-		if uc.specials[i].name == s {
-			return true
-		}
-	}
-	return false
 }

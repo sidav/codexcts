@@ -10,6 +10,12 @@ var heroCardsDb = []*heroCard{
 			{5, 3, 4},
 			{8, 4, 5},
 		},
+		levelsPassiveAbilities: []unitPassiveAbility{
+			{
+				code:               UPA_READINESS,
+				availableFromLevel: 8,
+			},
+		},
 		levelsAbilitiesTexts: []string{
 			"",
 			"Attacks: deal 1 damage to that opponent's base (target).",

@@ -23,8 +23,8 @@ func (r *tcellRenderer) renderCardInHand(c card, x, y, w, h int) {
 	case *unitCard:
 		cc := c.(*unitCard)
 		cw.SetFg(tcell.ColorGray)
-		for i := range cc.specials {
-			cw.PutStringCenteredAt(cc.specials[i].getFormattedName(), x+w/2, y+3+i)
+		for i := range cc.passiveAbilities {
+			cw.PutStringCenteredAt(cc.passiveAbilities[i].getFormattedName(), x+w/2, y+3+i)
 		}
 		cw.ResetStyle()
 		elementAndTechLine += fmt.Sprintf(" Tech %d", cc.techLevel)
@@ -68,8 +68,8 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 		cc := c.(*unitCard)
 		cw.SetFg(tcell.ColorGray)
 		cw.PutStringCenteredAt("Unit - "+cc.getSubtype(), x+w/2, y+separatorRelY-1)
-		for i := range cc.specials {
-			cw.PutStringCenteredAt(cc.specials[i].getFormattedName(), x+w/2, y+separatorRelY+3+i)
+		for i := range cc.passiveAbilities {
+			cw.PutStringCenteredAt(cc.passiveAbilities[i].getFormattedName(), x+w/2, y+separatorRelY+3+i)
 		}
 		cw.ResetStyle()
 		elementAndTechLine += fmt.Sprintf(" Tech %d", cc.techLevel)
