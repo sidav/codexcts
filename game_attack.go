@@ -15,7 +15,7 @@ func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*play
 			}
 		}
 	}
-	if onlyPatrolZone { // patrol zone empty, adding everything the player has
+	if !onlyPatrolZone { // patrol zone empty, adding everything the player has
 		list = append(list, &playerZoneCoords{enemy, PLAYERZONE_MAIN_BASE, 0})
 		for i, t := range enemy.techBuildings {
 			if t != nil {

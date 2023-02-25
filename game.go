@@ -138,7 +138,7 @@ func (g *game) upkeepPhase() {
 			tb.isUnderConstruction = false
 		}
 	}
-	if plr.addonBuilding.static.givesOneMoreDraw {
+	if plr.addonBuilding != nil && plr.addonBuilding.static.givesOneMoreDraw {
 		plr.drawCard()
 	}
 }

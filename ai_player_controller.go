@@ -24,10 +24,11 @@ func (ai *aiPlayerController) act(g *game) {
 
 func (ai *aiPlayerController) actMain(g *game) {
 	// plr := ai.controlsPlayer
+	const ACTIONS_PER_TURN = 5
 	// first, play random card from hand as a worker
 	ai.addWorker(g)
 	performedActions := 0
-	for performedActions < 3 {
+	for performedActions < ACTIONS_PER_TURN {
 		if ai.tryPerformRandomAction(g) {
 			performedActions++
 		}
@@ -47,7 +48,7 @@ func (ai *aiPlayerController) addWorker(g *game) {
 
 func (ai *aiPlayerController) tryPerformRandomAction(g *game) bool {
 	// TODO: build
-	actionToPerform := rnd.Rand(8)
+	actionToPerform := rnd.Rand(10)
 	switch {
 	case actionToPerform == 0:
 		return ai.tryPlayUnit(g)
@@ -59,7 +60,7 @@ func (ai *aiPlayerController) tryPerformRandomAction(g *game) bool {
 		return ai.tryBuild(g)
 	case actionToPerform == 4:
 		return ai.tryLevelUpHero(g)
-	case actionToPerform == 5:
+	case actionToPerform < 7:
 		return ai.tryAttack(g)
 	default:
 		log.Println("I skipped an action.")
