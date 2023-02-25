@@ -127,7 +127,7 @@ func (r *tcellRenderer) renderEnemyField() {
 }
 
 func (r *tcellRenderer) renderPlayerField() {
-	r.currUiLine = r.h / 2
+	r.currUiLine = r.h/2 - 2
 	r.renderOtherZone(r.activePlayer, 14, r.currUiLine, true)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
@@ -147,8 +147,9 @@ func (r *tcellRenderer) renderPlayerField() {
 	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
 	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.activePlayer.gold), 0)
-	cw.ResetStyle()
+	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 	r.drawLineAndIncrementY("C - access command zone", 0)
+	cw.ResetStyle()
 	r.renderPatrolZone(r.activePlayer, r.h-cardShortH-patrolZoneH-2)
 	r.renderHand()
 }
@@ -187,10 +188,11 @@ func (r *tcellRenderer) renderOtherZone(p *player, x, y int, renderSelectionStri
 	const keys = "QWERT     "
 	for i, unt := range p.otherZone {
 		str := "    "
+		a, d := unt.getAtkHp()
 		if renderSelectionStrings {
 			str = string(keys[i]) + " - "
 		}
-		str += unt.card.getName()
+		str += fmt.Sprintf("%d/%d %s", a, d, unt.card.getName())
 		if unt.isHero() {
 			str += fmt.Sprintf(" LVL %d", unt.level)
 		}
@@ -228,33 +230,33 @@ func (r *tcellRenderer) renderCodexSelection(p *player) {
 	r.currUiLine = wy + 1
 	codex := p.codices[r.pc.currentCodexPage]
 	cw.SetFg(tcell.ColorDarkMagenta)
-	r.drawLineAndIncrementY("MAGIC:", wx+3)
+	separatorText, prevSeparatorText := "", ""
 	for i := range codex.cards {
+		selectionLine := ""
 		thisCard := codex.getCardByIndex(i)
+		switch thisCard.(type) {
+		case *magicCard:
+			separatorText = "MAGIC"
+			selectionLine = fmt.Sprintf("%s - %-25s (x%d)", string(playerCodexCardSelectionKeys[i]),
+				thisCard.getName(), codex.cardsCounts[i])
+		case *unitCard:
+			separatorText = fmt.Sprintf("TECH %d UNITS", thisCard.(*unitCard).techLevel)
+			a, d := thisCard.(*unitCard).baseAtk, thisCard.(*unitCard).baseHP
+			selectionLine = fmt.Sprintf("%s - %-25s %d/%d (x%d)", string(playerCodexCardSelectionKeys[i]),
+				thisCard.getName(), a, d, codex.cardsCounts[i])
+		}
+		// draw separator line if neccessary
+		if separatorText != prevSeparatorText {
+			cw.SetFg(tcell.ColorDarkMagenta)
+			r.drawLineAndIncrementY(separatorText, wx+3)
+		}
+		prevSeparatorText = separatorText
 		if codex.cardsCounts[i] > 0 {
 			cw.SetFg(tcell.ColorWhite)
 		} else {
 			cw.SetFg(tcell.ColorDarkGray)
 		}
-		r.drawLineAndIncrementY(fmt.Sprintf("%s - %-25s (x%d)", string(playerCodexCardSelectionKeys[i]),
-			thisCard.getName(), codex.cardsCounts[i]), wx+1)
-		// draw separator line if neccessary
-		cw.SetFg(tcell.ColorDarkMagenta)
-		if i != len(codex.cards)-1 {
-			nextCard := codex.getCardByIndex(i + 1)
-			switch thisCard.(type) {
-			case *magicCard:
-				if _, ok := nextCard.(*unitCard); ok {
-					r.drawLineAndIncrementY(fmt.Sprintf("TECH %d UNITS:", nextCard.(*unitCard).techLevel), wx+3)
-				}
-			case *unitCard:
-				if _, ok := nextCard.(*unitCard); ok {
-					if nextCard.(*unitCard).techLevel != thisCard.(*unitCard).techLevel {
-						r.drawLineAndIncrementY(fmt.Sprintf("TECH %d UNITS:", nextCard.(*unitCard).techLevel), wx+3)
-					}
-				}
-			}
-		}
+		r.drawLineAndIncrementY(selectionLine, wx+1)
 	}
 }
 
