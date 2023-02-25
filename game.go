@@ -1,7 +1,9 @@
 package main
 
 type game struct {
-	players             [2]*player
+	players            [2]*player
+	playersControllers []callbackableController
+
 	currentPlayer       *player
 	currentPlayerNumber int
 	currentTurn         int
@@ -153,6 +155,15 @@ func (g *game) discardPhase() {
 		p.drawCard()
 	}
 	p.sortHand()
+}
+
+func (g *game) getPlayerNumber(p *player) int {
+	for i := range g.players {
+		if g.players[i] == p {
+			return i
+		}
+	}
+	panic("Waaat")
 }
 
 func (g *game) getEnemyForPlayer(p *player) *player {

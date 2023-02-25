@@ -1,26 +1,71 @@
 package main
 
-func (g *game) getAttackableCoordsForUnit(u *unit, owner *player) []*coords {
+func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*playerZoneCoords {
 	enemy := g.getEnemyForPlayer(owner)
 	if enemy.patrolZone[0] != nil {
-		return []*coords{{PLAYERZONE_PATROL, 0}}
+		return []*playerZoneCoords{{PLAYERZONE_PATROL, 0}}
 	}
-	list := make([]*coords, 0)
+	list := make([]*playerZoneCoords, 0)
 	for i, p := range enemy.patrolZone {
 		if p != nil {
-			list = append(list, &coords{PLAYERZONE_PATROL, i})
+			list = append(list, &playerZoneCoords{PLAYERZONE_PATROL, i})
 		}
 	}
 	if len(list) == 0 { // patrol zone empty, adding everything the player has
-		list = append(list, &coords{PLAYERZONE_MAIN_BASE, 0})
+		list = append(list, &playerZoneCoords{PLAYERZONE_MAIN_BASE, 0})
 		for i, t := range enemy.techBuildings {
 			if t != nil {
-				list = append(list, &coords{PLAYERZONE_TECH_BUILDINGS, i})
+				list = append(list, &playerZoneCoords{PLAYERZONE_TECH_BUILDINGS, i})
 			}
 		}
 		if enemy.addonBuilding != nil {
-			list = append(list, &coords{PLAYERZONE_ADDON_BUILDING, 0})
+			list = append(list, &playerZoneCoords{PLAYERZONE_ADDON_BUILDING, 0})
 		}
 	}
 	return list
+}
+
+func (g *game) tryAttackAsUnit(attacker *unit, owner *player) bool {
+	if attacker.tapped {
+		return false
+	}
+	coords := g.getAttackableCoordsForUnit(attacker, owner)
+	if len(coords) == 0 {
+		return false
+	}
+	var selectedCoords *playerZoneCoords
+	if len(coords) == 1 {
+		selectedCoords = coords[0]
+	} else {
+		selectedCoords = g.playersControllers[g.getPlayerNumber(owner)].selectCoordsFromListCallback(
+			"Select the target of the attack", coords)
+	}
+	g.performAttack(attacker, owner, selectedCoords, g.getEnemyForPlayer(owner))
+	return true
+}
+
+func (g *game) performAttack(attacker *unit, attackerOwner *player, targetCoords *playerZoneCoords, targetOwner *player) {
+	atk, _ := attacker.getAtkHp()
+	switch targetCoords.zone {
+	case PLAYERZONE_MAIN_BASE:
+		targetOwner.baseHealth -= atk
+	case PLAYERZONE_TECH_BUILDINGS:
+		targetOwner.techBuildings[targetCoords.indexInZone].currentHitpoints -= atk
+		if targetOwner.techBuildings[targetCoords.indexInZone].currentHitpoints <= 0 {
+			targetOwner.baseHealth -= 2
+		}
+	case PLAYERZONE_ADDON_BUILDING:
+		targetOwner.addonBuilding.currentHitpoints -= atk
+		if targetOwner.addonBuilding.currentHitpoints <= 0 {
+			targetOwner.baseHealth -= 2
+		}
+	case PLAYERZONE_OTHER:
+		target := targetOwner.otherZone[targetCoords.indexInZone]
+		target.wounds += atk
+	case PLAYERZONE_PATROL:
+		target := targetOwner.patrolZone[targetCoords.indexInZone]
+		backAtk, _ := target.getAtkHp()
+		target.wounds += atk
+		attacker.wounds += backAtk
+	}
 }

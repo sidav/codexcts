@@ -8,7 +8,7 @@ const (
 	PLAYERZONE_MAIN_BASE
 )
 
-type coords struct {
+type playerZoneCoords struct {
 	zone        int
 	indexInZone int
 }
