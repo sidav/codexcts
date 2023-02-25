@@ -46,6 +46,7 @@ func (pc *playerController) phaseEnded() bool {
 }
 
 func (pc *playerController) act(g *game) {
+	pc.endPhase = false
 	io.renderGame(g, g.currentPlayerNumber, pc)
 	switch g.currentPhase {
 	case PHASE_MAIN:
@@ -54,8 +55,8 @@ func (pc *playerController) act(g *game) {
 		pc.selectCardFromCodex(g)
 	default:
 		pc.resetState()
-		time.Sleep(200 * time.Millisecond)
 		pc.endPhase = true
+		time.Sleep(200 * time.Millisecond)
 	}
 }
 
