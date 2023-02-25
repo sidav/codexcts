@@ -12,7 +12,8 @@ const (
 	PCMODE_MOVE_SELECTED_UNIT
 	PCMODE_SELECT_BUILDING
 	PCMODE_SELECT_HERO_TO_PLAY
-	PCMODE_SELECT_CARD_FROM_CODEX
+
+	PCMODE_CALLBACK_TARGET_SELECTION
 )
 
 var playerHandSelectionKeys = "1234567890"
@@ -30,6 +31,10 @@ type playerController struct {
 	selectedUnitIndex   int
 	currentCodexPage    int
 
+	callbackCoordsList []*playerZoneCoords
+	callbackMessage    string
+	g                  *game
+
 	endPhase bool
 }
 
@@ -46,6 +51,7 @@ func (pc *playerController) phaseEnded() bool {
 }
 
 func (pc *playerController) act(g *game) {
+	pc.g = g
 	pc.endPhase = false
 	io.renderGame(g, g.currentPlayerNumber, pc)
 	switch g.currentPhase {

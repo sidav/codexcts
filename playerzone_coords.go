@@ -9,6 +9,7 @@ const (
 )
 
 type playerZoneCoords struct {
+	player      *player
 	zone        int
 	indexInZone int
 }

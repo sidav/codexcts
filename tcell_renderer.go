@@ -57,6 +57,8 @@ func (r *tcellRenderer) renderPcmodeSpecific() {
 		r.renderSelectBuildingMenu()
 	case PCMODE_SELECT_HERO_TO_PLAY:
 		r.renderCommandZone(r.activePlayer)
+	case PCMODE_CALLBACK_TARGET_SELECTION:
+		r.renderAttackSelection()
 	default:
 		panic("Check for pc mode specifics in renderer!")
 	}

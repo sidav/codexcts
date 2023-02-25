@@ -16,12 +16,12 @@ func (u *unit) isHero() bool {
 func (u *unit) getAtkHp() (int, int) {
 	switch u.card.(type) {
 	case *unitCard:
-		return u.card.(*unitCard).baseAtk, u.card.(*unitCard).baseHP
+		return u.card.(*unitCard).baseAtk, u.card.(*unitCard).baseHP - u.wounds
 	case *heroCard:
 		hc := u.card.(*heroCard)
 		for i := len(hc.levelsAttDef) - 1; i >= 0; i-- {
 			if u.level >= hc.levelsAttDef[i][0] {
-				return hc.levelsAttDef[i][1], hc.levelsAttDef[i][2]
+				return hc.levelsAttDef[i][1], hc.levelsAttDef[i][2] - u.wounds
 			}
 		}
 	}
