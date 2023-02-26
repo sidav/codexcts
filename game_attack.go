@@ -89,10 +89,15 @@ func (g *game) resolveAttack(attacker *unit, attackingPlayer *player, targetCoor
 		targetUnit = defendingPlayer.patrolZone[targetIndex]
 		switch targetIndex {
 		case 0:
-			g.messageForPlayer += fmt.Sprintf("%s's %s is in leader slot, thus getting 1 armor. \n ",
-				defendingPlayer.name,
-				targetUnit.getName())
-			targetArmorBonus++
+			if defendingPlayer.patrolLeaderHasShield {
+				g.messageForPlayer += fmt.Sprintf("%s's %s is in leader slot, thus getting 1 armor. \n ",
+					defendingPlayer.name,
+					targetUnit.getName())
+				targetArmorBonus++
+				defendingPlayer.patrolLeaderHasShield = false
+			} else {
+				g.messageForPlayer += "Defender has already spent its shield from patrol position. \n "
+			}
 		case 1:
 			g.messageForPlayer += fmt.Sprintf("%s's %s is in elite slot, thus getting +1 damage. \n ",
 				defendingPlayer.name,

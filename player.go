@@ -14,9 +14,10 @@ type player struct {
 	cardsToAddNextTurn          [2]card
 	cardsAddedFromCodexThisTurn int
 
-	gold                int
-	workers             int
-	hiredWorkerThisTurn bool
+	gold                  int
+	workers               int
+	hiredWorkerThisTurn   bool
+	patrolLeaderHasShield bool
 
 	baseHealth    int
 	techBuildings [3]*building

@@ -94,7 +94,7 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 	usePatrollers := rnd.OneChanceFrom(2) ||
 		g.getEnemyForPlayer(ai.controlsPlayer).countUntappedUnitsInPatrolZone() <= ai.controlsPlayer.countUntappedUnitsInPatrolZone()
 	requiredAttack := 1
-	if enemy.patrolZone[0] != nil {
+	if enemy.patrolZone[0] != nil && enemy.patrolLeaderHasShield {
 		requiredAttack = 2
 	}
 	for _, u := range ai.controlsPlayer.otherZone {

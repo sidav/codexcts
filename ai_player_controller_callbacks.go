@@ -7,6 +7,8 @@ func (ai *aiPlayerController) selectCoordsFromListCallback(message string, coord
 		switch coords[x].zone {
 		case PLAYERZONE_PATROL, PLAYERZONE_OTHER: // TODO: change (coords selection may be positive thing). Solution: AI modes?
 			return 1
+		case PLAYERZONE_MAIN_BASE:
+			return 10
 		default:
 			return 5
 		}

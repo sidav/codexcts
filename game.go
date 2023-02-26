@@ -137,6 +137,7 @@ func (g *game) untapPhase() {
 
 func (g *game) upkeepPhase() {
 	plr := g.currentPlayer
+	plr.patrolLeaderHasShield = true
 	plr.gold += plr.workers
 	if plr.gold > 20 {
 		plr.gold = 20
