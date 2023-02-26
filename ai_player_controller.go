@@ -43,7 +43,7 @@ func (ai *aiPlayerController) actMain(g *game) {
 	// attack-related actions
 	for i := 0; i < 5; i++ {
 		actionTaken := ai.tryAttack(g)
-		actionTaken = actionTaken || ai.tryMoveUnit(g)
+		actionTaken = actionTaken || ai.tryMoveUnits(g)
 		if !actionTaken {
 			break
 		}
@@ -132,22 +132,84 @@ func (ai *aiPlayerController) playHero(g *game) bool {
 	}
 }
 
-func (ai *aiPlayerController) tryMoveUnit(g *game) bool {
+func (ai *aiPlayerController) tryMoveUnits(g *game) bool {
 	plr := ai.controlsPlayer
-	if len(plr.otherZone) == 0 {
-		log.Printf("There are no units to move.\n")
-		return false
-	}
-	indexToMove := rnd.Rand(len(plr.otherZone))
-	unitToMove := plr.otherZone[indexToMove]
-	for i := range plr.patrolZone {
-		if plr.patrolZone[i] == nil && rnd.OneChanceFrom(5) {
-			plr.moveUnit(unitToMove, PLAYERZONE_OTHER, indexToMove, PLAYERZONE_PATROL, i)
-			break
+	moved := false
+	// Maybe move something from patrol to other zone?
+	if plr.countUnitsInPatrolZone() > 0 {
+		index := rnd.SelectRandomIndexFromWeighted(plr.countUnitsInPatrolZone(), func(x int) int {
+			if plr.patrolZone[x] == nil {
+				return 0
+			}
+			if plr.patrolZone[x].tapped {
+				return 10
+			}
+			return plr.patrolZone[x].wounds
+		})
+		if index == -1 {
+			// nothing.
+		} else {
+			unitToMove := plr.patrolZone[index]
+			plr.moveUnit(unitToMove, PLAYERZONE_PATROL, index, PLAYERZONE_OTHER, 0)
+			log.Printf("I moved %s (tapped: %v, wounds %d) to other zone.\n", unitToMove.getName(), unitToMove.tapped, unitToMove.wounds)
+			moved = true
 		}
 	}
-	log.Printf("I moved %s to other zone.\n", unitToMove.getName())
-	return true
+	// Maybe move something from other zone to patrol?
+	if len(plr.otherZone) > 0 {
+		index := rnd.SelectRandomIndexFromWeighted(len(plr.otherZone), func(x int) int {
+			if plr.otherZone[x].tapped {
+				return 0
+			}
+			if plr.otherZone[x].hasPassiveAbility(UPA_HEALING) {
+				return 0
+			}
+			_, hp := plr.otherZone[x].getAtkHpWithWounds()
+			return hp
+		})
+		if index == -1 {
+			// nothing.
+		} else {
+			unitToMove := plr.otherZone[index]
+			// select patrol place
+			patrolIndex := rnd.SelectRandomIndexFromWeighted(5, func(x int) int {
+				atk, hp := unitToMove.getAtkHpWithWounds()
+				prob := 0
+				switch x {
+				case 0:
+					prob = 5
+					if hp <= 2 {
+						prob = 6
+					}
+				case 1:
+					prob = 2
+					if atk <= 2 {
+						prob = 4
+					}
+				case 2:
+					prob = 2
+					if plr.gold < 2 {
+						prob = 4
+					}
+				case 3:
+					prob = 2
+					if plr.hand.size() < 3 {
+						prob = 5 - plr.hand.size()
+					}
+				case 4:
+					prob = 2
+				}
+				if plr.patrolZone[x] != nil {
+					prob /= 2
+				}
+				return prob
+			})
+			plr.moveUnit(unitToMove, PLAYERZONE_OTHER, index, PLAYERZONE_PATROL, patrolIndex)
+			log.Printf("I moved %s (tapped: %v, wounds %d) to patrol zone.\n", unitToMove.getName(), unitToMove.tapped, unitToMove.wounds)
+			moved = true
+		}
+	}
+	return moved
 }
 
 func (ai *aiPlayerController) tryBuild(g *game) bool {
@@ -201,7 +263,7 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 		return false
 	} else {
 		attackerIndex := rnd.SelectRandomIndexFromWeighted(len(candidates), func(ind int) int {
-			atk, hp := candidates[ind].getAtkHp()
+			atk, hp := candidates[ind].getAtkHpWithWounds()
 			if atk < 2 {
 				return atk
 			}

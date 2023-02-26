@@ -52,7 +52,7 @@ func (r *tcellRenderer) renderAttackSelection() {
 			unt = coordPlayer.patrolZone[coord.indexInZone]
 		}
 		if unt != nil {
-			untAtk, untHp := unt.getAtkHp()
+			untAtk, untHp := unt.getAtkHpWithWounds()
 			selectionString = fmt.Sprintf("%s - %d/%d %s", string(coordsSelectableWithCallback[index]),
 				untAtk, untHp, unt.getName())
 		}

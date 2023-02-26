@@ -198,7 +198,7 @@ func (r *tcellRenderer) renderOtherZone(p *player, x, y int, renderSelectionStri
 	const keys = "QWERT     "
 	for i, unt := range p.otherZone {
 		str := "    "
-		a, d := unt.getAtkHp()
+		a, d := unt.getAtkHpWithWounds()
 		if renderSelectionStrings {
 			str = string(keys[i]) + " - "
 		}

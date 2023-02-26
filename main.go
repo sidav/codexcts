@@ -18,7 +18,7 @@ func main() {
 	onInit()
 	defer onClose()
 
-	if len(os.Args) > 1 && os.Args[1] == "log" || os.Args[1] == "aivsai" {
+	if len(os.Args) > 1 && (os.Args[1] == "log" || os.Args[1] == "aivsai") {
 		f, err := os.OpenFile("debug_output.log",
 			os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {

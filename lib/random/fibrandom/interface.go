@@ -37,6 +37,9 @@ func (rnd *fibRandom) SelectRandomIndexFromWeighted(totalIndices int, getWeight 
 	for i := 0; i < totalIndices; i++ {
 		totalWeights += getWeight(i)
 	}
+	if totalWeights == 0 {
+		return -1
+	}
 	rand := rnd.Rand(totalWeights)
 	for i := 0; i < totalIndices; i++ {
 		if rand < getWeight(i) {
@@ -123,6 +126,9 @@ func (rnd *fibRandom) SelectRandomIndexFromWeightsArray(weights []int) int {
 	totalWeights := 0
 	for i := range weights {
 		totalWeights += weights[i]
+	}
+	if totalWeights == 0 {
+		return -1
 	}
 	rand := rnd.Rand(totalWeights)
 	for i := range weights {

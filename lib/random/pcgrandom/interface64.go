@@ -60,6 +60,9 @@ func (rnd *PCG64) SelectRandomIndexFromWeighted(totalIndices int, getWeight func
 	for i := 0; i < totalIndices; i++ {
 		totalWeights += getWeight(i)
 	}
+	if totalWeights == 0 {
+		return -1
+	}
 	rand := rnd.Rand(totalWeights)
 	for i := 0; i < totalIndices; i++ {
 		if rand < getWeight(i) {
@@ -115,6 +118,9 @@ func (rnd *PCG64) SelectRandomIndexFromWeightsArray(weights []int) int {
 	totalWeights := 0
 	for i := range weights {
 		totalWeights += weights[i]
+	}
+	if totalWeights == 0 {
+		return -1
 	}
 	rand := rnd.Rand(totalWeights)
 	for i := range weights {

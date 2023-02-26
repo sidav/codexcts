@@ -100,7 +100,7 @@ func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
 	}
 	cw.DrawFilledRect(' ', x, y, w, h)
 	cw.PutTextInRect(u.getName(), x+1, y, w-2)
-	atk, hp := u.getAtkHp()
+	atk, hp := u.getAtkHpWithWounds()
 	abs := u.getListOfPassiveAbilities()
 	for i, a := range abs {
 		cw.PutStringCenteredAt(a.getFormattedName(), x+w/2, y+i+2)

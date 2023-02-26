@@ -37,7 +37,7 @@ func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*play
 }
 
 func (g *game) resolveAttack(attacker *unit, attackingPlayer *player, targetCoords *playerZoneCoords) {
-	atk, _ := attacker.getAtkHp()
+	atk, _ := attacker.getAtkHpWithWounds()
 	defendingPlayer := targetCoords.player
 	var targetUnit *unit
 	targetIndex := targetCoords.indexInZone
@@ -101,7 +101,7 @@ func (g *game) resolveAttack(attacker *unit, attackingPlayer *player, targetCoor
 		}
 		g.messageForPlayer += fmt.Sprintf("Defender: %s \n ", targetUnit.getNameWithStats())
 		atk -= targetArmorBonus
-		backAtk, _ := targetUnit.getAtkHp()
+		backAtk, _ := targetUnit.getAtkHpWithWounds()
 		backAtk += targetAttackBonus
 		targetUnit.wounds += atk
 		attacker.wounds += backAtk
@@ -116,7 +116,7 @@ func (g *game) removeDeadUnits() {
 	for _, p := range g.players {
 		for ind := len(p.otherZone) - 1; ind >= 0; ind-- {
 			unt := p.otherZone[ind]
-			_, hp := unt.getAtkHp()
+			_, hp := unt.getAtkHpWithWounds()
 			if hp <= 0 {
 				g.messageForPlayer += fmt.Sprintf("%s's %s dies. \n ", p.name, unt.getName())
 				if unt.isHero() {
@@ -137,7 +137,7 @@ func (g *game) removeDeadUnits() {
 			if unt == nil {
 				continue
 			}
-			_, hp := unt.getAtkHp()
+			_, hp := unt.getAtkHpWithWounds()
 			if hp <= 0 {
 				g.messageForPlayer += fmt.Sprintf("%s's %s dies. \n ", p.name, unt.getName())
 				if unt.isHero() {

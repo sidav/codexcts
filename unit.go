@@ -16,7 +16,7 @@ func (u *unit) getName() string {
 }
 
 func (u *unit) getNameWithStats() string {
-	a, h := u.getAtkHp()
+	a, h := u.getAtkHpWithWounds()
 	return fmt.Sprintf("%d/%d %s", a, h, u.card.getName())
 }
 
@@ -25,7 +25,7 @@ func (u *unit) isHero() bool {
 	return ok
 }
 
-func (u *unit) getAtkHp() (int, int) {
+func (u *unit) getAtkHpWithWounds() (int, int) {
 	switch u.card.(type) {
 	case *unitCard:
 		return u.card.(*unitCard).baseAtk, u.card.(*unitCard).baseHP - u.wounds
