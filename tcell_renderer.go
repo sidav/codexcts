@@ -235,6 +235,7 @@ func (r *tcellRenderer) renderCommandZone(p *player) {
 	for i, h := range p.commandZone {
 		if h != nil {
 			r.renderCardFull(h, cx+i*(cardW+2), cy, cardW, cardH)
+			cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 			cw.PutStringCenteredAt(fmt.Sprintf("Press %d to hire", i+1), cx+i*(cardW+2)+cardW/2, cy+cardH)
 		}
 	}
@@ -334,7 +335,7 @@ func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 		if unitHere != nil {
 			r.drawUnit(unitHere, x+i*cardW+1, y+1, cardW-1, patrolZoneH-2)
 		}
-		if unitHere == nil && p == r.activePlayer {
+		if p == r.activePlayer {
 			cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
 			cw.PutStringCenteredAt(hotkey, currX+cardW/2, y)
 		}

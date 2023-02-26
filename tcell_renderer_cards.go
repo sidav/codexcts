@@ -96,7 +96,7 @@ func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
 	if u.tapped {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkBlue)
 	} else {
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorGray)
 	}
 	cw.DrawFilledRect(' ', x, y, w, h)
 	cw.PutTextInRect(u.getName(), x+1, y, w-2)
