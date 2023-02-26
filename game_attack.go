@@ -4,16 +4,22 @@ import "fmt"
 
 func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*playerZoneCoords {
 	enemy := g.getEnemyForPlayer(owner)
+	attackerFlying := attacker.hasPassiveAbility(UPA_FLYING)
+	attackerAA := attacker.hasPassiveAbility(UPA_ANTI_AIR)
 	if enemy.patrolZone[0] != nil {
-		return []*playerZoneCoords{{enemy, PLAYERZONE_PATROL, 0}}
+		if attackerFlying == enemy.patrolZone[0].hasPassiveAbility(UPA_FLYING) {
+			return []*playerZoneCoords{{enemy, PLAYERZONE_PATROL, 0}}
+		}
 	}
 	onlyPatrolZone := false
 	list := make([]*playerZoneCoords, 0)
-	for i, p := range enemy.patrolZone {
-		if p != nil {
-			list = append(list, &playerZoneCoords{enemy, PLAYERZONE_PATROL, i})
-			if !p.tapped {
-				onlyPatrolZone = true
+	for i, patroller := range enemy.patrolZone {
+		if patroller != nil {
+			if attackerAA == patroller.hasPassiveAbility(UPA_FLYING) || attackerFlying == patroller.hasPassiveAbility(UPA_FLYING) {
+				list = append(list, &playerZoneCoords{enemy, PLAYERZONE_PATROL, i})
+				if !patroller.tapped && attackerFlying == patroller.hasPassiveAbility(UPA_FLYING) {
+					onlyPatrolZone = true
+				}
 			}
 		}
 	}
@@ -29,7 +35,9 @@ func (g *game) getAttackableCoordsForUnit(attacker *unit, owner *player) []*play
 		}
 		for i, p := range enemy.otherZone {
 			if p != nil {
-				list = append(list, &playerZoneCoords{enemy, PLAYERZONE_OTHER, i})
+				if attackerAA == p.hasPassiveAbility(UPA_FLYING) || attackerFlying == p.hasPassiveAbility(UPA_FLYING) {
+					list = append(list, &playerZoneCoords{enemy, PLAYERZONE_OTHER, i})
+				}
 			}
 		}
 	}
@@ -105,11 +113,15 @@ func (g *game) resolveAttack(attacker *unit, attackingPlayer *player, targetCoor
 		backAtk, _ := targetUnit.getAtkHpWithWounds()
 		backAtk += targetAttackBonus
 		targetUnit.wounds += atk
-		attacker.wounds += backAtk
 		g.messageForPlayer += fmt.Sprintf("Defending %s took %d damage from attacker, now having %d wounds. \n ",
 			targetUnit.getName(), atk, targetUnit.wounds)
-		g.messageForPlayer += fmt.Sprintf("Attacking %s took %d damage from defender, now having %d wounds. \n ",
-			attacker.getName(), backAtk, attacker.wounds)
+		if attacker.hasPassiveAbility(UPA_FLYING) && !(targetUnit.hasPassiveAbility(UPA_FLYING) || targetUnit.hasPassiveAbility(UPA_ANTI_AIR)) {
+			g.messageForPlayer += fmt.Sprintf("Attacking %s took no damage from defender, as it has flying. \n ", attacker.getName())
+		} else {
+			attacker.wounds += backAtk
+			g.messageForPlayer += fmt.Sprintf("Attacking %s took %d damage from defender, now having %d wounds. \n ",
+				attacker.getName(), backAtk, attacker.wounds)
+		}
 	}
 }
 

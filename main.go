@@ -53,5 +53,20 @@ func main() {
 		controlsPlayer: g.players[1],
 	})
 	g.players[1].name = "AI - Player 2"
+
+	// debug units
+	//g.players[0].otherZone = append(g.players[0].otherZone, &unit{
+	//	card: getCardByName("Eggship"),
+	//})
+	//g.players[0].otherZone = append(g.players[0].otherZone, &unit{
+	//	card: getCardByName("Eggship"),
+	//})
+	//g.players[0].otherZone = append(g.players[0].otherZone, &unit{
+	//	card: getCardByName("Leaping Lizard"),
+	//})
+	//g.players[1].patrolZone[0] = &unit{
+	//	card: getCardByName("Eggship"),
+	//}
+
 	gameLoop(g)
 }

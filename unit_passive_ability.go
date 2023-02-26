@@ -22,12 +22,12 @@ func (us *unitPassiveAbility) getFormattedName() string {
 		name = "Readiness"
 	case UPA_FRENZY:
 		name = "Frenzy"
+	case UPA_ANTI_AIR:
+		name = "Anti-Air"
+	case UPA_FLYING:
+		name = "Flying"
 	//case UPA_SPARKSHOT:
 	//	name = "Sparkshot"
-	//case UPA_ANTI_AIR:
-	//	name = "Anti-Air"
-	//case UPA_FLYING:
-	//	name = "Flying"
 	default:
 		name = "UNNAMED_ABILITY_" + strconv.Itoa(int(us.code))
 	}
