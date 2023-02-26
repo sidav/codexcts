@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 type game struct {
 	players            [2]*player
 	playersControllers []callbackableController
@@ -63,9 +65,15 @@ func (g *game) endCurrentPhase() {
 	if g.currentPhase == PHASE_CODEX &&
 		// don't end phase if a player has not taken their cards
 		(g.currentPlayer.isObligatedToAdd2Cards() && g.currentPlayer.cardsAddedFromCodexThisTurn < 2) {
-		// BUG: only one card can be added if the player is not obligated to take two.
+		// BUG: only one card can be added if the player is not obligated to take two. TODO: fix
 		return
 	}
+
+	if g.currentPlayer.baseHealth <= 0 {
+		log.Printf("%s wins! \n", g.getEnemyForPlayer(g.currentPlayer).name)
+		exitGame = true
+	}
+
 	g.currentPhase++
 	// end turn
 	if g.currentPhase == TOTAL_PHASES {

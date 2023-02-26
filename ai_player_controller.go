@@ -13,7 +13,11 @@ func (ai *aiPlayerController) phaseEnded() bool {
 func (ai *aiPlayerController) act(g *game) {
 	switch g.currentPhase {
 	case PHASE_MAIN:
-		log.Printf("===== AI TURN %d =====\n", g.currentTurn)
+		plr := ai.controlsPlayer
+		log.Println("")
+		log.Printf("======= AI: %s TURN %d =======\n", ai.controlsPlayer.name, g.currentTurn)
+		log.Printf("Hand size: %d, draw size: %d, discard size: %d \n",
+			plr.hand.size(), plr.draw.size(), plr.discard.size())
 		log.Printf("Main phase\n")
 		ai.logHand()
 		ai.actMain(g)
@@ -24,26 +28,45 @@ func (ai *aiPlayerController) act(g *game) {
 
 func (ai *aiPlayerController) actMain(g *game) {
 	// plr := ai.controlsPlayer
-	const ACTIONS_PER_TURN = 10
+	const economicActionsPerTurn = 7
 	// first, play random card from hand as a worker
-	ai.addWorker(g)
-	performedActions := 0
-	for performedActions < ACTIONS_PER_TURN {
-		if ai.tryPerformRandomAction(g) {
-			performedActions++
+	ai.tryAddWorker(g)
+	performedEconomicActions := 0
+	for performedEconomicActions < economicActionsPerTurn {
+		if ai.tryPerformRandomEconomicAction(g) {
+			performedEconomicActions++
 		}
 	}
-	ai.tryPerformRandomAction(g)
+	// attack-related actions
+	for i := 0; i < 5; i++ {
+		ai.tryAttack(g)
+		ai.tryMoveUnit(g)
+	}
 	log.Printf("I ended my main phase with $%d. \n", ai.controlsPlayer.gold)
 }
 
-func (ai *aiPlayerController) addWorker(g *game) {
+func (ai *aiPlayerController) tryAddWorker(g *game) bool {
 	plr := ai.controlsPlayer
-	if plr.gold > 0 && plr.hand.size() > 0 && plr.workers < 10 {
-		worker := plr.hand[rnd.Rand(plr.hand.size())]
-		log.Printf("I played %s as worker.\n", worker.getName())
-		g.tryPlayCardAsWorker(worker)
+	if plr.gold == 0 || plr.workers >= 10 && rnd.Rand(plr.workers) > 0 {
+		return false
 	}
+	index := rnd.SelectRandomIndexFromWeighted(len(plr.hand), func(i int) int {
+		switch plr.hand[i].(type) {
+		case *magicCard:
+			return 100 // TODO: change when the AI will be able to cast spells
+		case *unitCard:
+			if g.canPlayerPlayCard(plr, plr.hand[i]) {
+				return 5 // playable cards are non-tech-dependent, so not important?
+			} else {
+				return 1
+			}
+		}
+		return 0
+	})
+	worker := plr.hand[index]
+	log.Printf("I played %s as worker.\n", worker.getName())
+	g.tryPlayCardAsWorker(worker)
+	return true
 }
 
 func (ai *aiPlayerController) tryPlayUnit(g *game) bool {

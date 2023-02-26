@@ -18,7 +18,7 @@ func main() {
 	onInit()
 	defer onClose()
 
-	if len(os.Args) == 2 && os.Args[1] == "log" {
+	if len(os.Args) > 1 && os.Args[1] == "log" || os.Args[1] == "aivsai" {
 		f, err := os.OpenFile("debug_output.log",
 			os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {
@@ -33,16 +33,25 @@ func main() {
 	rnd = pcgrandom.New(-1)
 	g := &game{}
 	g.initGame()
-	g.playersControllers = append(g.playersControllers, &playerController{
-		controlsPlayer:              g.players[0],
-		currentMode:                 PCMODE_NONE,
-		currentSelectedCardFromHand: nil,
-		currentSelectedUnit:         nil,
-	})
-	g.players[0].name = "Player"
+
+	if len(os.Args) > 1 && os.Args[1] == "aivsai" {
+		g.players[0].name = "Player 1"
+		g.playersControllers = append(g.playersControllers, &aiPlayerController{
+			controlsPlayer: g.players[0],
+		})
+	} else {
+		g.players[0].name = "Player"
+		g.playersControllers = append(g.playersControllers, &playerController{
+			controlsPlayer:              g.players[0],
+			currentMode:                 PCMODE_NONE,
+			currentSelectedCardFromHand: nil,
+			currentSelectedUnit:         nil,
+		})
+	}
+
 	g.playersControllers = append(g.playersControllers, &aiPlayerController{
 		controlsPlayer: g.players[1],
 	})
-	g.players[1].name = "AI"
+	g.players[1].name = "AI - Player 2"
 	gameLoop(g)
 }
