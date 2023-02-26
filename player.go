@@ -75,6 +75,16 @@ func (p *player) countUnitsInPatrolZone() int {
 	return sum
 }
 
+func (p *player) countUntappedUnitsInPatrolZone() int {
+	sum := 0
+	for _, u := range p.patrolZone {
+		if u != nil && !u.tapped {
+			sum++
+		}
+	}
+	return sum
+}
+
 func (p *player) sortHand() {
 	p.hand.sortByName()
 	p.hand.sortByCost()
@@ -96,6 +106,9 @@ func (p *player) drawCard() {
 	if p.draw.size() == 0 {
 		p.addDiscardIntoDraw()
 		p.shuffleDraw()
+	}
+	if p.draw.size() == 0 {
+		return
 	}
 	p.hand.moveFrom(&p.draw)
 }

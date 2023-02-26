@@ -70,7 +70,7 @@ func (g *game) endCurrentPhase() {
 	}
 
 	if g.currentPlayer.baseHealth <= 0 {
-		log.Printf("%s wins! \n", g.getEnemyForPlayer(g.currentPlayer).name)
+		log.Printf("%s wins on turn %d! \n", g.getEnemyForPlayer(g.currentPlayer).name, g.currentTurn)
 		exitGame = true
 	}
 

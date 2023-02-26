@@ -15,17 +15,20 @@ func (ai *aiPlayerController) act(g *game) {
 	switch g.currentPhase {
 	case PHASE_MAIN:
 		ai.isItsTurn = true
-		plr := ai.controlsPlayer
 		log.Println("")
 		log.Printf("======= AI: %s TURN %d =======\n", ai.controlsPlayer.name, g.currentTurn)
-		log.Printf("Hand size: %d, draw size: %d, discard size: %d \n",
-			plr.hand.size(), plr.draw.size(), plr.discard.size())
 		log.Printf("Main phase\n")
-		ai.logHand()
+		ai.logFullReport()
 		ai.actMain(g)
 	case PHASE_CODEX:
 		ai.actCodex(g)
 		ai.isItsTurn = false
+
+		// cheats for AI. I couldn't make it play better yet. :(
+		ai.controlsPlayer.gold++
+		if ai.controlsPlayer.hand.size() < 5 {
+			ai.controlsPlayer.drawCard()
+		}
 	}
 }
 
@@ -41,13 +44,13 @@ func (ai *aiPlayerController) actMain(g *game) {
 		}
 	}
 	// attack-related actions
-	for i := 0; i < 5; i++ {
-		actionTaken := ai.tryAttack(g)
-		actionTaken = actionTaken || ai.tryMoveUnits(g)
-		if !actionTaken {
-			break
-		}
+	attackActions := 10 // 3 + rnd.Rand(5)
+	for i := 0; i < attackActions; i++ {
+		ai.tryAttack(g)
 	}
+	ai.tryMoveUnits(g)
+	ai.tryMoveUnits(g)
+
 	log.Printf("I ended my main phase with $%d. \n", plr.gold)
 	log.Printf("Hand size: %d, draw size: %d, discard size: %d \n",
 		plr.hand.size(), plr.draw.size(), plr.discard.size())
@@ -96,7 +99,7 @@ func (ai *aiPlayerController) tryAddWorker(g *game) bool {
 }
 
 func (ai *aiPlayerController) tryPlayUnit(g *game) bool {
-	ai.logHand()
+	// ai.logHand()
 	plr := ai.controlsPlayer
 	var cardToPlay card
 	for _, c := range plr.hand {
@@ -130,86 +133,6 @@ func (ai *aiPlayerController) playHero(g *game) bool {
 		log.Printf("  I didn't found any heroes\n")
 		return false
 	}
-}
-
-func (ai *aiPlayerController) tryMoveUnits(g *game) bool {
-	plr := ai.controlsPlayer
-	moved := false
-	// Maybe move something from patrol to other zone?
-	if plr.countUnitsInPatrolZone() > 0 {
-		index := rnd.SelectRandomIndexFromWeighted(plr.countUnitsInPatrolZone(), func(x int) int {
-			if plr.patrolZone[x] == nil {
-				return 0
-			}
-			if plr.patrolZone[x].tapped {
-				return 10
-			}
-			return plr.patrolZone[x].wounds
-		})
-		if index == -1 {
-			// nothing.
-		} else {
-			unitToMove := plr.patrolZone[index]
-			plr.moveUnit(unitToMove, PLAYERZONE_PATROL, index, PLAYERZONE_OTHER, 0)
-			log.Printf("I moved %s (tapped: %v, wounds %d) to other zone.\n", unitToMove.getName(), unitToMove.tapped, unitToMove.wounds)
-			moved = true
-		}
-	}
-	// Maybe move something from other zone to patrol?
-	if len(plr.otherZone) > 0 {
-		index := rnd.SelectRandomIndexFromWeighted(len(plr.otherZone), func(x int) int {
-			if plr.otherZone[x].tapped {
-				return 0
-			}
-			if plr.otherZone[x].hasPassiveAbility(UPA_HEALING) {
-				return 0
-			}
-			_, hp := plr.otherZone[x].getAtkHpWithWounds()
-			return hp
-		})
-		if index == -1 {
-			// nothing.
-		} else {
-			unitToMove := plr.otherZone[index]
-			// select patrol place
-			patrolIndex := rnd.SelectRandomIndexFromWeighted(5, func(x int) int {
-				atk, hp := unitToMove.getAtkHpWithWounds()
-				prob := 0
-				switch x {
-				case 0:
-					prob = 5
-					if hp <= 2 {
-						prob = 6
-					}
-				case 1:
-					prob = 2
-					if atk <= 2 {
-						prob = 4
-					}
-				case 2:
-					prob = 2
-					if plr.gold < 2 {
-						prob = 4
-					}
-				case 3:
-					prob = 2
-					if plr.hand.size() < 3 {
-						prob = 5 - plr.hand.size()
-					}
-				case 4:
-					prob = 2
-				}
-				if plr.patrolZone[x] != nil {
-					prob /= 2
-				}
-				return prob
-			})
-			plr.moveUnit(unitToMove, PLAYERZONE_OTHER, index, PLAYERZONE_PATROL, patrolIndex)
-			log.Printf("I moved %s (tapped: %v, wounds %d) to patrol zone.\n", unitToMove.getName(), unitToMove.tapped, unitToMove.wounds)
-			moved = true
-		}
-	}
-	return moved
 }
 
 func (ai *aiPlayerController) tryBuild(g *game) bool {
@@ -246,35 +169,6 @@ func (ai *aiPlayerController) tryLevelUpHero(g *game) bool {
 	}
 }
 
-func (ai *aiPlayerController) tryAttack(g *game) bool {
-	var candidates []*unit
-	for _, u := range ai.controlsPlayer.otherZone {
-		if g.canUnitAttack(u) {
-			candidates = append(candidates, u)
-		}
-	}
-	for _, u := range ai.controlsPlayer.patrolZone {
-		if u != nil && g.canUnitAttack(u) {
-			candidates = append(candidates, u)
-		}
-	}
-	if len(candidates) == 0 {
-		log.Println("I have nothing to attack with.")
-		return false
-	} else {
-		attackerIndex := rnd.SelectRandomIndexFromWeighted(len(candidates), func(ind int) int {
-			atk, hp := candidates[ind].getAtkHpWithWounds()
-			if atk < 2 {
-				return atk
-			}
-			return 3*atk + hp
-		})
-		attacker := candidates[attackerIndex]
-		log.Printf("I attack with %s.", attacker.getName())
-		return g.tryAttackAsUnit(ai.controlsPlayer, attacker)
-	}
-}
-
 func (ai *aiPlayerController) actCodex(g *game) {
 	plr := ai.controlsPlayer
 	if plr.workers > 10 && !rnd.OneChanceFrom(3) {
@@ -299,4 +193,32 @@ func (ai *aiPlayerController) logHand() {
 	for _, c := range ai.controlsPlayer.hand {
 		log.Printf("   %s", c.getName())
 	}
+}
+
+func (ai *aiPlayerController) logFullReport() {
+	plr := ai.controlsPlayer
+	log.Printf("Buildings: Base %d/20. ", plr.baseHealth)
+	for i, b := range plr.techBuildings {
+		if b != nil {
+			log.Printf(" T%d: %s (%dhp)", i, b.static.name, b.currentHitpoints)
+		}
+	}
+	if plr.addonBuilding != nil {
+		log.Printf(" %s: %dhp", plr.addonBuilding.static.name, plr.addonBuilding.currentHitpoints)
+	}
+	log.Printf("Units in other zone:")
+	for _, u := range plr.otherZone {
+		log.Println(u.getNameWithStats())
+	}
+	log.Printf("Units in patrol zone:")
+	for i, u := range plr.patrolZone {
+		if u != nil {
+			log.Printf("%d: %s", i, u.getNameWithStats())
+		} else {
+			log.Printf("%d: --", i)
+		}
+	}
+	log.Printf("Hand size: %d, draw size: %d, discard size: %d \n",
+		plr.hand.size(), plr.draw.size(), plr.discard.size())
+	ai.logHand()
 }

@@ -53,25 +53,26 @@ func (g *game) resolveAttack(attacker *unit, attackingPlayer *player, targetCoor
 	switch targetCoords.zone {
 	case PLAYERZONE_MAIN_BASE:
 		defendingPlayer.baseHealth -= atk
-		g.messageForPlayer += fmt.Sprintf("%s's base took %d damage. \n ", defendingPlayer.name, atk)
+		g.messageForPlayer += fmt.Sprintf("%s's base took %d damage. (%d HP remaining)\n ", defendingPlayer.name,
+			atk, defendingPlayer.baseHealth)
 	case PLAYERZONE_TECH_BUILDINGS:
 		defendingPlayer.techBuildings[targetIndex].currentHitpoints -= atk
-		g.messageForPlayer += fmt.Sprintf("%s's %s took %d damage. \n ", defendingPlayer.name,
-			defendingPlayer.techBuildings[targetIndex].static.name,
-			atk)
+		g.messageForPlayer += fmt.Sprintf("%s's %s took %d damage (%d HP remaining). \n ", defendingPlayer.name,
+			defendingPlayer.techBuildings[targetIndex].static.name, atk, defendingPlayer.techBuildings[targetIndex].currentHitpoints)
 		if defendingPlayer.techBuildings[targetIndex].currentHitpoints <= 0 {
-			g.messageForPlayer += fmt.Sprintf(" It's destroyed! %s's base took 2 damage. \n ", defendingPlayer.name)
 			defendingPlayer.baseHealth -= 2
+			g.messageForPlayer += fmt.Sprintf(" It's destroyed! %s's base took 2 damage (%d HP remaining). \n ",
+				defendingPlayer.name, defendingPlayer.baseHealth)
 			defendingPlayer.techBuildings[targetIndex] = nil // TODO: rebuildability
 		}
 	case PLAYERZONE_ADDON_BUILDING:
 		defendingPlayer.addonBuilding.currentHitpoints -= atk
-		g.messageForPlayer += fmt.Sprintf("%s's %s took %d damage. \n ", defendingPlayer.name,
-			defendingPlayer.addonBuilding.static.name,
-			atk)
+		g.messageForPlayer += fmt.Sprintf("%s's %s took %d damage (%d HP remaining). \n ", defendingPlayer.name,
+			defendingPlayer.addonBuilding.static.name, atk, defendingPlayer.addonBuilding.currentHitpoints)
 		if defendingPlayer.addonBuilding.currentHitpoints <= 0 {
-			g.messageForPlayer += fmt.Sprintf(" It's destroyed! %s's base took 2 damage. \n ", defendingPlayer.name)
 			defendingPlayer.baseHealth -= 2
+			g.messageForPlayer += fmt.Sprintf(" It's destroyed! %s's base took 2 damage (%d HP remaining). \n ",
+				defendingPlayer.name, defendingPlayer.baseHealth)
 			defendingPlayer.addonBuilding = nil
 		}
 	case PLAYERZONE_OTHER:
