@@ -85,9 +85,15 @@ func (ai *aiPlayerController) tryMoveUnits(g *game) bool {
 }
 
 func (ai *aiPlayerController) tryAttack(g *game) bool {
+	plr := ai.controlsPlayer
+	enemy := g.getEnemyForPlayer(plr)
 	var candidates []*unit
 	usePatrollers := rnd.OneChanceFrom(2) ||
 		g.getEnemyForPlayer(ai.controlsPlayer).countUntappedUnitsInPatrolZone() <= ai.controlsPlayer.countUntappedUnitsInPatrolZone()
+	requiredAttack := 1
+	if enemy.patrolZone[0] != nil {
+		requiredAttack = 2
+	}
 	for _, u := range ai.controlsPlayer.otherZone {
 		if g.canUnitAttack(u) {
 			candidates = append(candidates, u)
@@ -106,14 +112,17 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 	} else {
 		attackerIndex := rnd.SelectRandomIndexFromWeighted(len(candidates), func(ind int) int {
 			atk, hp := candidates[ind].getAtkHpWithWounds()
+			if candidates[ind].hasPassiveAbility(UPA_FRENZY) {
+				atk++
+			}
+			if atk < requiredAttack {
+				return 0
+			}
 			if candidates[ind].hasPassiveAbility(UPA_HEALING) {
 				return 0
 			}
 			if candidates[ind].hasPassiveAbility(UPA_HASTE) {
 				return 2 * atk
-			}
-			if candidates[ind].hasPassiveAbility(UPA_FRENZY) {
-				return 3*(atk+1) + hp
 			}
 			if atk < 2 {
 				return atk
