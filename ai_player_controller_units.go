@@ -36,6 +36,9 @@ func (ai *aiPlayerController) tryMoveUnits(g *game) bool {
 			if plr.otherZone[x].hasPassiveAbility(UPA_HEALING) {
 				return 0
 			}
+			if plr.otherZone[x].hasPassiveAbility(UPA_FLYING) {
+				return 0 // TODO: other number if the enemy has flying units
+			}
 			_, hp := plr.otherZone[x].getAtkHpWithWounds()
 			return hp
 		})
@@ -123,6 +126,9 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 			}
 			if candidates[ind].hasPassiveAbility(UPA_HASTE) {
 				return 2 * atk
+			}
+			if candidates[ind].hasPassiveAbility(UPA_FLYING) {
+				return 5 * atk // TODO: consider anti-air
 			}
 			if atk < 2 {
 				return atk
