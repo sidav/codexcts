@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func (g *game) tryPlayCardAsWorker(c card) bool {
 	if g.currentPlayer.gold > 0 && !g.currentPlayer.hiredWorkerThisTurn {
 		g.currentPlayer.hand.removeThis(c)
@@ -94,6 +96,35 @@ func (g *game) tryBuildBuildingForPlayer(p *player, b *buildingStatic) bool {
 			currentHitpoints:    b.maxHitpoints,
 			isUnderConstruction: true,
 		}
+	}
+	return true
+}
+
+func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
+	if !g.canUnitAttack(attacker) {
+		return false
+	}
+	coords := g.getAttackableCoordsForUnit(attacker, owner)
+	if len(coords) == 0 {
+		return false
+	}
+	g.messageForPlayer = fmt.Sprintf("%s's %s attacks. \n ", owner.name, attacker.getNameWithStats())
+	var selectedCoords *playerZoneCoords
+	if len(coords) == 1 {
+		selectedCoords = coords[0]
+	} else {
+		selectedCoords = g.playersControllers[g.getPlayerNumber(owner)].selectCoordsFromListCallback(
+			"Select the target of the attack", coords)
+	}
+	g.messageForPlayer += fmt.Sprintf("Target coords: %s. \n ", selectedCoords.getFormattedName())
+	g.resolveAttack(attacker, owner, selectedCoords)
+	g.removeDeadUnits()
+	if !attacker.hasPassiveAbility(UPA_READINESS) {
+		attacker.tapped = true
+	}
+	attacker.attackedThisTurn = true
+	for _, contr := range g.playersControllers {
+		contr.showMessage("COMBAT", g.messageForPlayer)
 	}
 	return true
 }
