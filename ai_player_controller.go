@@ -4,6 +4,7 @@ import "log"
 
 type aiPlayerController struct {
 	controlsPlayer *player
+	isItsTurn      bool
 }
 
 func (ai *aiPlayerController) phaseEnded() bool {
@@ -13,6 +14,7 @@ func (ai *aiPlayerController) phaseEnded() bool {
 func (ai *aiPlayerController) act(g *game) {
 	switch g.currentPhase {
 	case PHASE_MAIN:
+		ai.isItsTurn = true
 		plr := ai.controlsPlayer
 		log.Println("")
 		log.Printf("======= AI: %s TURN %d =======\n", ai.controlsPlayer.name, g.currentTurn)
@@ -23,11 +25,12 @@ func (ai *aiPlayerController) act(g *game) {
 		ai.actMain(g)
 	case PHASE_CODEX:
 		ai.actCodex(g)
+		ai.isItsTurn = false
 	}
 }
 
 func (ai *aiPlayerController) actMain(g *game) {
-	// plr := ai.controlsPlayer
+	plr := ai.controlsPlayer
 	const economicActionsPerTurn = 7
 	// first, play random card from hand as a worker
 	ai.tryAddWorker(g)
@@ -39,17 +42,36 @@ func (ai *aiPlayerController) actMain(g *game) {
 	}
 	// attack-related actions
 	for i := 0; i < 5; i++ {
-		ai.tryAttack(g)
-		ai.tryMoveUnit(g)
+		actionTaken := ai.tryAttack(g)
+		actionTaken = actionTaken || ai.tryMoveUnit(g)
+		if !actionTaken {
+			break
+		}
 	}
-	log.Printf("I ended my main phase with $%d. \n", ai.controlsPlayer.gold)
+	log.Printf("I ended my main phase with $%d. \n", plr.gold)
+	log.Printf("Hand size: %d, draw size: %d, discard size: %d \n",
+		plr.hand.size(), plr.draw.size(), plr.discard.size())
 }
 
 func (ai *aiPlayerController) tryAddWorker(g *game) bool {
 	plr := ai.controlsPlayer
-	if plr.gold == 0 || plr.workers >= 10 && rnd.Rand(plr.workers) > 0 {
+	if plr.gold == 0 {
 		return false
 	}
+
+	// TODO: change when the AI will be able to cast spells
+	hasCardsWhichAiCantPlay := false
+	for _, c := range plr.hand {
+		if _, ok := c.(*magicCard); ok {
+			hasCardsWhichAiCantPlay = true
+			break
+		}
+	}
+
+	if !hasCardsWhichAiCantPlay && plr.workers >= 10 && rnd.Rand(plr.workers*3) > 0 {
+		return false
+	}
+
 	index := rnd.SelectRandomIndexFromWeighted(len(plr.hand), func(i int) int {
 		switch plr.hand[i].(type) {
 		case *magicCard:
@@ -64,9 +86,13 @@ func (ai *aiPlayerController) tryAddWorker(g *game) bool {
 		return 0
 	})
 	worker := plr.hand[index]
-	log.Printf("I played %s as worker.\n", worker.getName())
-	g.tryPlayCardAsWorker(worker)
-	return true
+	if g.tryPlayCardAsWorker(worker) {
+		log.Printf("I played %s as %dth worker.\n", worker.getName(), plr.workers)
+		return true
+	} else {
+		log.Printf("I can't play %s as worker! \n", worker.getName())
+		return false
+	}
 }
 
 func (ai *aiPlayerController) tryPlayUnit(g *game) bool {
@@ -189,7 +215,7 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 
 func (ai *aiPlayerController) actCodex(g *game) {
 	plr := ai.controlsPlayer
-	if plr.workers > 10 && !rnd.OneChanceFrom(10) {
+	if plr.workers > 10 && !rnd.OneChanceFrom(3) {
 		log.Printf("I'm not adding any more cards.\n")
 		return
 	}

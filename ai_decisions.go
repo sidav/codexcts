@@ -18,13 +18,13 @@ func (ai *aiPlayerController) decideRandomEconomicAction(g *game) int {
 	action := rnd.SelectRandomIndexFromWeighted(AiDecisionsCount, func(act int) int {
 		switch act {
 		case AiDecisionPlayUnit:
-			return 1
+			return 2
 		case AiDecisionPlayHero:
 			return 2
 		case AiDecisionBuild:
 			return 1
 		case AiDecisionLevelUp:
-			return 1
+			return 2
 		case AiDecisionAbstain:
 			return 1
 		default:
