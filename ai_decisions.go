@@ -27,7 +27,10 @@ func (ai *aiPlayerController) decideRandomAction(g *game) int {
 		case AiDecisionLevelUp:
 			return 1
 		case AiDecisionAttack:
-			return len(ai.controlsPlayer.otherZone)
+			if g.getEnemyForPlayer(ai.controlsPlayer).countUnitsInPatrolZone() == 0 {
+				return 20
+			}
+			return len(ai.controlsPlayer.getUnitsInAllActiveZones())
 		case AiDecisionAbstain:
 			return 1
 		default:

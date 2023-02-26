@@ -24,7 +24,7 @@ func (ai *aiPlayerController) act(g *game) {
 
 func (ai *aiPlayerController) actMain(g *game) {
 	// plr := ai.controlsPlayer
-	const ACTIONS_PER_TURN = 5
+	const ACTIONS_PER_TURN = 10
 	// first, play random card from hand as a worker
 	ai.addWorker(g)
 	performedActions := 0
@@ -139,6 +139,11 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 	var candidates []*unit
 	for _, u := range ai.controlsPlayer.otherZone {
 		if g.canUnitAttack(u) {
+			candidates = append(candidates, u)
+		}
+	}
+	for _, u := range ai.controlsPlayer.patrolZone {
+		if u != nil && g.canUnitAttack(u) {
 			candidates = append(candidates, u)
 		}
 	}

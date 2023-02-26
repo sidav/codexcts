@@ -159,6 +159,9 @@ func (r *tcellRenderer) renderPlayerField() {
 
 func (r *tcellRenderer) renderHand() {
 	cards := len(r.activePlayer.hand)
+	if cards == 0 {
+		return
+	}
 	cardW := r.w / cards
 	if cardW > r.w/5 {
 		cardW = r.w / 5

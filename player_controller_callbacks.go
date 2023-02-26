@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"github.com/gdamore/tcell/v2"
+	"strings"
+)
 
 const coordsSelectableWithCallback = "1234567890qwertyuiop"
 
@@ -21,7 +24,7 @@ func (pc *playerController) selectCoordsFromListCallback(message string, coords 
 }
 
 func (pc *playerController) showMessage(title, msg string) {
-	io.showMessageWindow(title, msg)
+	io.showMessageWindow(title, msg, tcell.ColorRed)
 	for readKey() != "ENTER" {
 	}
 }

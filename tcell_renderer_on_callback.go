@@ -5,10 +5,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func (r *tcellRenderer) showMessageWindow(title string, msg string) {
+func (r *tcellRenderer) showMessageWindow(title string, msg string, color tcell.Color) {
 	ww, wh := r.w/2, 5*r.h/6
 	wx, wy := r.w/2-ww/2, r.h/2-wh/2
-	r.drawWindow(title, wx, wy, ww, wh, tcell.ColorBlue)
+	r.drawWindow(title, wx, wy, ww, wh, color)
 	cw.ResetStyle()
 	cw.PutTextInRect(msg, wx+1, wy+1, ww-2)
 	cw.FlushScreen()

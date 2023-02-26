@@ -40,8 +40,8 @@ func (g *game) initGame() {
 	g.currentPlayerNumber = 0
 	g.currentPhase = 0
 
-	g.players[0].commandZone[0] = heroCardsDb[0]
-	g.players[1].commandZone[0] = heroCardsDb[1]
+	g.players[0].commandZone[0] = heroCardsDb[1]
+	g.players[1].commandZone[0] = heroCardsDb[0]
 
 	// form codices
 	for _, p := range g.players {

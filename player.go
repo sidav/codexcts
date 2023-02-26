@@ -65,6 +65,16 @@ func (p *player) getUnitsInAllActiveZones() (units []*unit) {
 	return
 }
 
+func (p *player) countUnitsInPatrolZone() int {
+	sum := 0
+	for _, u := range p.patrolZone {
+		if u != nil {
+			sum++
+		}
+	}
+	return sum
+}
+
 func (p *player) sortHand() {
 	p.hand.sortByName()
 	p.hand.sortByCost()
