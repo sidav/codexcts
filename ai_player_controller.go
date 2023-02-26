@@ -148,6 +148,9 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 	} else {
 		attackerIndex := rnd.SelectRandomIndexFromWeighted(len(candidates), func(ind int) int {
 			atk, hp := candidates[ind].getAtkHp()
+			if atk < 2 {
+				return atk
+			}
 			return 3*atk + hp
 		})
 		attacker := candidates[attackerIndex]
