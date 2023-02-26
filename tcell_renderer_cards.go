@@ -101,6 +101,10 @@ func (r *tcellRenderer) drawUnit(u *unit, x, y, w, h int) {
 	cw.DrawFilledRect(' ', x, y, w, h)
 	cw.PutTextInRect(u.getName(), x+1, y, w-2)
 	atk, hp := u.getAtkHp()
+	abs := u.getListOfPassiveAbilities()
+	for i, a := range abs {
+		cw.PutStringCenteredAt(a.getFormattedName(), x+w/2, y+i+2)
+	}
 	if u.isHero() {
 		cw.PutStringCenteredAt(fmt.Sprintf("LEVEL %d", u.level), x+w/2, y+h-2)
 	}

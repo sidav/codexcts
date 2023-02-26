@@ -40,7 +40,7 @@ func (u *unit) getAtkHp() (int, int) {
 	return -99, -99
 }
 
-func (u *unit) hasPassiveAbility(code unitPassiveAbilityCode) bool {
+func (u *unit) hasPassiveAbility(code UPACode) bool {
 	switch u.card.(type) {
 	case *unitCard:
 		uc := u.card.(*unitCard)
@@ -60,7 +60,24 @@ func (u *unit) hasPassiveAbility(code unitPassiveAbilityCode) bool {
 	return false
 }
 
-func (u *unit) getPassiveAbilityValue(code unitPassiveAbilityCode) int {
+func (u *unit) getListOfPassiveAbilities() []unitPassiveAbility {
+	switch u.card.(type) {
+	case *unitCard:
+		return u.card.(*unitCard).passiveAbilities
+	case *heroCard:
+		abs := make([]unitPassiveAbility, 0)
+		hc := u.card.(*heroCard)
+		for i := range hc.levelsPassiveAbilities {
+			if u.level >= hc.levelsPassiveAbilities[i].availableFromLevel {
+				abs = append(abs, hc.levelsPassiveAbilities[i])
+			}
+		}
+		return abs
+	}
+	panic("getListOfPassiveAbilities()")
+}
+
+func (u *unit) getPassiveAbilityValue(code UPACode) int {
 	sum := 0
 	switch u.card.(type) {
 	case *unitCard:

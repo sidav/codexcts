@@ -6,7 +6,7 @@ import (
 )
 
 type unitPassiveAbility struct {
-	code               unitPassiveAbilityCode
+	code               UPACode
 	availableFromLevel int // heroes only
 	value              int
 }
@@ -38,10 +38,10 @@ func (us *unitPassiveAbility) getFormattedName() string {
 	}
 }
 
-type unitPassiveAbilityCode uint8
+type UPACode uint8
 
 const (
-	UPA_HASTE unitPassiveAbilityCode = iota
+	UPA_HASTE UPACode = iota
 	UPA_HEALING
 	UPA_FRENZY
 	UPA_SPARKSHOT
