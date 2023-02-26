@@ -110,3 +110,18 @@ func (rnd *PCG64) GenerateRandomPrimeInRange(from, to int) int {
 func (rnd *PCG64) OneChanceFrom(numChances int) bool {
 	return rnd.Rand(numChances) == 0
 }
+
+func (rnd *PCG64) SelectRandomIndexFromWeightsArray(weights []int) int {
+	totalWeights := 0
+	for i := range weights {
+		totalWeights += weights[i]
+	}
+	rand := rnd.Rand(totalWeights)
+	for i := range weights {
+		if rand < weights[i] {
+			return i
+		}
+		rand -= weights[i]
+	}
+	panic("SelectRandomIndexFromWeightsArray panicked!!11")
+}

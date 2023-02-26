@@ -46,28 +46,6 @@ func (ai *aiPlayerController) addWorker(g *game) {
 	}
 }
 
-func (ai *aiPlayerController) tryPerformRandomAction(g *game) bool {
-	// TODO: build
-	actionToPerform := rnd.Rand(10)
-	switch {
-	case actionToPerform == 0:
-		return ai.tryPlayUnit(g)
-	case actionToPerform == 1:
-		return ai.playHero(g)
-	case actionToPerform == 2:
-		return ai.tryMoveUnit(g)
-	case actionToPerform == 3:
-		return ai.tryBuild(g)
-	case actionToPerform == 4:
-		return ai.tryLevelUpHero(g)
-	case actionToPerform < 7:
-		return ai.tryAttack(g)
-	default:
-		log.Println("I skipped an action.")
-		return true
-	}
-}
-
 func (ai *aiPlayerController) tryPlayUnit(g *game) bool {
 	ai.logHand()
 	plr := ai.controlsPlayer
@@ -168,7 +146,11 @@ func (ai *aiPlayerController) tryAttack(g *game) bool {
 		log.Println("I have nothing to attack with.")
 		return false
 	} else {
-		attacker := candidates[rnd.Rand(len(candidates))]
+		attackerIndex := rnd.SelectRandomIndexFromWeighted(len(candidates), func(ind int) int {
+			atk, hp := candidates[ind].getAtkHp()
+			return 3*atk + hp
+		})
+		attacker := candidates[attackerIndex]
 		log.Printf("I attack with %s.", attacker.getName())
 		return g.tryAttackAsUnit(ai.controlsPlayer, attacker)
 	}

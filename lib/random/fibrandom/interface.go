@@ -118,3 +118,18 @@ func (rnd *fibRandom) RandInRange(from, to int) int { //should be inclusive
 	}
 	return rnd.Rand(to-from+1) + from
 }
+
+func (rnd *fibRandom) SelectRandomIndexFromWeightsArray(weights []int) int {
+	totalWeights := 0
+	for i := range weights {
+		totalWeights += weights[i]
+	}
+	rand := rnd.Rand(totalWeights)
+	for i := range weights {
+		if rand < weights[i] {
+			return i
+		}
+		rand -= weights[i]
+	}
+	panic("SelectRandomIndexFromWeightsArray panicked!!11")
+}

@@ -97,6 +97,7 @@ func (g *game) tryBuildBuildingForPlayer(p *player, b *buildingStatic) bool {
 			isUnderConstruction: true,
 		}
 	}
+	p.gold -= b.cost
 	return true
 }
 

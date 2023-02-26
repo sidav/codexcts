@@ -7,4 +7,6 @@ type PRNG interface {
 	RollDice(int, int, int) int
 	OneChanceFrom(int) bool
 	RandomUnitVectorInt(bool) (int, int)
+	SelectRandomIndexFromWeightsArray([]int) int
+	SelectRandomIndexFromWeighted(int, func(int) int) int
 }
