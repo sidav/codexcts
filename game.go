@@ -141,6 +141,18 @@ func (g *game) upkeepPhase() {
 	if plr.addonBuilding != nil && plr.addonBuilding.static.givesOneMoreDraw {
 		plr.drawCard()
 	}
+	// healing, for units with healing.
+	healAmount := 0
+	units := plr.getUnitsInAllActiveZones()
+	for _, u := range units {
+		healAmount += u.getPassiveAbilityValue(UPA_HEALING)
+	}
+	for _, u := range units {
+		u.wounds -= healAmount
+		if u.wounds < 0 {
+			u.wounds = 0
+		}
+	}
 }
 
 func (g *game) discardPhase() {
@@ -151,13 +163,13 @@ func (g *game) discardPhase() {
 	}
 	p.discardHand()
 	for i := 0; i < cardsToDraw; i++ {
-		if len(p.draw) == 0 {
-			if len(p.discard) == 0 {
-				break
-			}
-			p.addDiscardIntoDraw()
-			p.shuffleDraw()
-		}
+		//if len(p.draw) == 0 {
+		//	if len(p.discard) == 0 {
+		//		break
+		//	}
+		//	p.addDiscardIntoDraw()
+		//	p.shuffleDraw()
+		//}
 		p.drawCard()
 	}
 	p.sortHand()

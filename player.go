@@ -53,6 +53,18 @@ func (p *player) moveUnit(u *unit, fromZone, indexFrom, toZone, indexTo int) {
 	}
 }
 
+func (p *player) getUnitsInAllActiveZones() (units []*unit) {
+	for _, u := range p.otherZone {
+		units = append(units, u)
+	}
+	for _, u := range p.patrolZone {
+		if u != nil {
+			units = append(units, u)
+		}
+	}
+	return
+}
+
 func (p *player) sortHand() {
 	p.hand.sortByName()
 	p.hand.sortByCost()
@@ -71,6 +83,10 @@ func (p *player) hasTechLevel(lvl int) bool {
 }
 
 func (p *player) drawCard() {
+	if p.draw.size() == 0 {
+		p.addDiscardIntoDraw()
+		p.shuffleDraw()
+	}
 	p.hand.moveFrom(&p.draw)
 }
 
