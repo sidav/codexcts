@@ -25,7 +25,7 @@ func (ai *aiPlayerController) act(g *game) {
 		ai.isItsTurn = false
 
 		// cheats for AI. I couldn't make it play better yet. :(
-		ai.controlsPlayer.gold++
+		ai.controlsPlayer.gold += rnd.Rand(2)
 		if ai.controlsPlayer.hand.size() < 5 {
 			ai.controlsPlayer.drawCard()
 		}
@@ -175,14 +175,29 @@ func (ai *aiPlayerController) actCodex(g *game) {
 		log.Printf("I'm not adding any more cards.\n")
 		return
 	}
-	codexIndex := 99
-	for codexIndex > 2 || plr.codices[codexIndex].getTotalCardsCount() == 0 {
-		codexIndex = rnd.Rand(3)
-	}
-	indexOfCard := 99
-	for indexOfCard > plr.codices[codexIndex].getRemainingUniqueCardsCount() {
-		indexOfCard = rnd.Rand(plr.codices[codexIndex].getRemainingUniqueCardsCount())
-	}
+	codexIndex := rnd.SelectRandomIndexFromWeighted(3, func(x int) int {
+		return plr.codices[x].getTotalCardsCount()
+	})
+	indexOfCard := rnd.SelectRandomIndexFromWeighted(len(plr.codices[codexIndex].cards), func(x int) int {
+		if plr.codices[codexIndex].cardsCounts[x] == 0 {
+			return 0
+		}
+		switch plr.codices[codexIndex].getCardByIndex(x).(type) {
+		case *magicCard:
+			return 1
+		case *unitCard:
+			uc := plr.codices[codexIndex].getCardByIndex(x).(*unitCard)
+			weight := 1
+			if plr.hasTechLevel(uc.techLevel) {
+				weight += 2
+			}
+			if len(uc.passiveAbilities) > 0 {
+				weight++
+			}
+			return weight
+		}
+		panic("Weight selection error")
+	})
 	cardToAdd := plr.codices[codexIndex].getCardByIndex(indexOfCard)
 	log.Printf("I add %s from my codex\n", cardToAdd.getName())
 	g.tryAddCardFromCodex(plr, cardToAdd, codexIndex)

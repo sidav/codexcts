@@ -138,6 +138,9 @@ func (g *game) untapPhase() {
 func (g *game) upkeepPhase() {
 	plr := g.currentPlayer
 	plr.gold += plr.workers
+	if plr.gold > 20 {
+		plr.gold = 20
+	}
 	if plr.addonBuilding != nil && plr.addonBuilding.isUnderConstruction {
 		plr.addonBuilding.isUnderConstruction = false
 	}
