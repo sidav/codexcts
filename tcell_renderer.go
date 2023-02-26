@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
+	"strconv"
 )
 
 const (
@@ -136,17 +137,26 @@ func (r *tcellRenderer) renderPlayerField() {
 		if tb != nil {
 			line := tb.static.name
 			if tb.isUnderConstruction {
-				line += " (under construction)"
+				cw.SetFg(tcell.ColorRed)
+				line += " (builds)"
+			} else {
+				cw.ResetStyle()
 			}
 			r.drawLineAndIncrementY(line, 0)
 		}
 	}
+	cw.ResetStyle()
 	if r.activePlayer.addonBuilding != nil {
 		r.drawLineAndIncrementY(r.activePlayer.addonBuilding.static.name, 0)
 	}
 	r.drawLineAndIncrementY("(B)build", 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DRAW: %4d", len(r.activePlayer.draw)), 0)
 	r.drawLineAndIncrementY(fmt.Sprintf("DISCARD: %d", len(r.activePlayer.discard)), 0)
+	if r.activePlayer.hiredWorkerThisTurn {
+		cw.SetFg(tcell.ColorGreen)
+	} else {
+		cw.SetFg(tcell.ColorRed)
+	}
 	r.drawLineAndIncrementY(fmt.Sprintf("WORKERS: %d", r.activePlayer.workers), 0)
 	cw.SetFg(tcell.ColorYellow)
 	r.drawLineAndIncrementY(fmt.Sprintf("$%d", r.activePlayer.gold), 0)
@@ -168,6 +178,8 @@ func (r *tcellRenderer) renderHand() {
 	}
 	for i, c := range r.activePlayer.hand {
 		r.renderCardInHand(c, i*(cardW), r.h-cardShortH, cardW, cardShortH)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
+		cw.PutStringCenteredAt(strconv.Itoa(i+1), i*(cardW)+cardW/2, r.h-cardShortH)
 	}
 }
 
@@ -223,6 +235,7 @@ func (r *tcellRenderer) renderCommandZone(p *player) {
 	for i, h := range p.commandZone {
 		if h != nil {
 			r.renderCardFull(h, cx+i*(cardW+2), cy, cardW, cardH)
+			cw.PutStringCenteredAt(fmt.Sprintf("Press %d to hire", i+1), cx+i*(cardW+2)+cardW/2, cy+cardH)
 		}
 	}
 }
@@ -240,6 +253,9 @@ func (r *tcellRenderer) renderCodexSelection(p *player) {
 		cw.DrawRect(cardX, cardY, 0, cardH)
 		cw.ResetStyle()
 		cw.PutStringCenteredAt("Select a card", cardX+cardW/2, cardY+cardH/2)
+		if !p.isObligatedToAdd2Cards() {
+			cw.PutStringCenteredAt("Or press ENTER to skip", cardX+cardW/2, cardY+cardH/2+1)
+		}
 	}
 	r.currUiLine = wy + 1
 	codex := p.codices[r.pc.currentCodexPage]
@@ -280,40 +296,47 @@ func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 	cardW := patrolZoneW / 5
 	for i := 0; i < 5; i++ {
 		currX := x + i*cardW
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorGray)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
 		cw.DrawRect(currX, y, cardW, patrolZoneH)
-		cw.SetStyle(tcell.ColorGray, tcell.ColorBlack)
+		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
+		position := ""
 		descrString := ""
 		hotkey := ""
 		switch i {
 		case 0:
-			cw.PutStringCenteredAt(" Squad leader", currX+cardW/2, y+1)
+			position = "Leader"
 			hotkey = "Y"
-			descrString = "+SHLD/Taunt"
+			if p.patrolLeaderHasShield {
+				descrString = "+SHLD/Taunt"
+			} else {
+				descrString = "+Taunt"
+			}
 		case 1:
-			cw.PutStringCenteredAt("Elite", currX+cardW/2, y+1)
+			position = "Elite"
 			hotkey = "U"
 			descrString = "+1 ATK"
 		case 2:
-			cw.PutStringCenteredAt("Scavenger", x+i*cardW+cardW/2, y+1)
+			position = "Scavenger"
 			hotkey = "I"
 			descrString = "Dies: +1$"
 		case 3:
-			cw.PutStringCenteredAt("Technician", x+i*cardW+cardW/2, y+1)
+			position = "Technician"
 			hotkey = "O"
 			descrString = "Dies: +1 Card"
 		case 4:
-			cw.PutStringCenteredAt("Lookout", x+i*cardW+cardW/2, y+1)
+			position = "Lookout"
 			hotkey = "P"
 			descrString = "Resist 1"
 		}
+		cw.PutStringCenteredAt(position, x+i*cardW+cardW/2, y+patrolZoneH/2)
 		cw.PutStringCenteredAt(descrString, currX+cardW/2, y+patrolZoneH)
 		unitHere := p.patrolZone[i]
 		if unitHere != nil {
 			r.drawUnit(unitHere, x+i*cardW+1, y+1, cardW-1, patrolZoneH-2)
 		}
 		if unitHere == nil && p == r.activePlayer {
-			cw.PutStringCenteredAt(hotkey, currX+cardW/2, y+patrolZoneH/2)
+			cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
+			cw.PutStringCenteredAt(hotkey, currX+cardW/2, y)
 		}
 	}
 }
