@@ -25,8 +25,10 @@ func (ai *aiPlayerController) act(g *game) {
 		ai.isItsTurn = false
 
 		// cheats for AI. I couldn't make it play better yet. :(
-		ai.controlsPlayer.gold += rnd.Rand(2)
-		if ai.controlsPlayer.hand.size() < 5 {
+		if rnd.OneChanceFrom(3) {
+			ai.controlsPlayer.gold++
+		}
+		if rnd.OneChanceFrom(2) && ai.controlsPlayer.hand.size() < 5 {
 			ai.controlsPlayer.drawCard()
 		}
 	}

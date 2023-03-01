@@ -104,7 +104,6 @@ func (r *tcellRenderer) renderHeader() {
 
 func (r *tcellRenderer) renderEnemyField() {
 	r.currUiLine = 1
-	r.renderOtherZone(r.enemy, 14, r.currUiLine, false)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.enemy.baseHealth), 0)
 	cw.ResetStyle()
@@ -124,12 +123,12 @@ func (r *tcellRenderer) renderEnemyField() {
 		r.drawLineAndIncrementY(r.enemy.addonBuilding.static.name, 0)
 	}
 
-	r.renderPatrolZone(r.enemy, 2)
+	r.renderPatrolZone(r.enemy, r.h-cardShortH-2*patrolZoneH-4, true)
+	r.renderOtherZone(r.enemy, 14, 1, false)
 }
 
 func (r *tcellRenderer) renderPlayerField() {
 	r.currUiLine = r.h/2 - 2
-	r.renderOtherZone(r.activePlayer, 14, r.currUiLine, true)
 	cw.SetStyle(tcell.ColorRed, tcell.ColorBlack)
 	r.drawLineAndIncrementY(fmt.Sprintf("Base HP %d", r.activePlayer.baseHealth), 0)
 	cw.ResetStyle()
@@ -163,7 +162,8 @@ func (r *tcellRenderer) renderPlayerField() {
 	cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 	r.drawLineAndIncrementY("C - access command zone", 0)
 	cw.ResetStyle()
-	r.renderPatrolZone(r.activePlayer, r.h-cardShortH-patrolZoneH-2)
+	r.renderPatrolZone(r.activePlayer, r.h-cardShortH-patrolZoneH-2, false)
+	r.renderOtherZone(r.activePlayer, 14, r.h/2-2, true)
 	r.renderHand()
 }
 
@@ -291,19 +291,24 @@ func (r *tcellRenderer) renderCodexSelection(p *player) {
 	}
 }
 
-func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
+func (r *tcellRenderer) renderPatrolZone(p *player, y int, shorten bool) {
 	x := r.w - patrolZoneW - 1
 	cw.ResetStyle()
 	cardW := patrolZoneW / 5
-	for i := 0; i < 5; i++ {
-		currX := x + i*cardW
+	currentDrawPos := 5
+	for pos := 4; pos >= 0; pos-- {
+		if shorten && p.patrolZone[pos] == nil {
+			continue
+		}
+		currentDrawPos--
+		currX := x + currentDrawPos*cardW
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
 		cw.DrawRect(currX, y, cardW, patrolZoneH)
 		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 		position := ""
 		descrString := ""
 		hotkey := ""
-		switch i {
+		switch pos {
 		case 0:
 			position = "Leader"
 			hotkey = "Y"
@@ -329,11 +334,11 @@ func (r *tcellRenderer) renderPatrolZone(p *player, y int) {
 			hotkey = "P"
 			descrString = "Resist 1"
 		}
-		cw.PutStringCenteredAt(position, x+i*cardW+cardW/2, y+patrolZoneH/2)
+		cw.PutStringCenteredAt(position, x+currentDrawPos*cardW+cardW/2, y+patrolZoneH/2)
 		cw.PutStringCenteredAt(descrString, currX+cardW/2, y+patrolZoneH)
-		unitHere := p.patrolZone[i]
+		unitHere := p.patrolZone[pos]
 		if unitHere != nil {
-			r.drawUnit(unitHere, x+i*cardW+1, y+1, cardW-1, patrolZoneH-2)
+			r.drawUnit(unitHere, x+currentDrawPos*cardW+1, y+1, cardW-2, patrolZoneH-2)
 		}
 		if p == r.activePlayer {
 			cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)

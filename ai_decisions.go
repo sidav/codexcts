@@ -16,23 +16,27 @@ func (ai *aiPlayerController) decideRandomEconomicAction(g *game) int {
 	if ai.controlsPlayer.gold == 0 {
 		return AiDecisionAbstain
 	}
+
+	const baseWeight = 3
+	weightForSpendingCard := ai.controlsPlayer.hand.size()
+	
 	action := rnd.SelectRandomIndexFromWeighted(AiDecisionsCount, func(act int) int {
 		switch act {
 		case AiDecisionPlayUnit:
-			return 2
+			return weightForSpendingCard
 		case AiDecisionPlayHero:
-			return 2
+			return baseWeight
 		case AiDecisionPlayMagic:
 			if ai.controlsPlayer.hasHeroOnField() {
-				return 1
+				return weightForSpendingCard
 			}
 			return 0
 		case AiDecisionBuild:
-			return 1
+			return baseWeight
 		case AiDecisionLevelUp:
-			return 2
+			return baseWeight
 		case AiDecisionAbstain:
-			return 1
+			return baseWeight
 		default:
 			panic("Wat")
 		}
