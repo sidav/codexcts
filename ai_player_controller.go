@@ -100,7 +100,9 @@ func (ai *aiPlayerController) tryPlayMagicCard(g *game) bool {
 	var cardToPlay card
 	for _, c := range plr.hand {
 		if _, isMagic := c.(*magicCard); isMagic {
-			cardToPlay = c
+			if cardToPlay == nil || rnd.OneChanceFrom(2) {
+				cardToPlay = c
+			}
 		}
 	}
 	if cardToPlay != nil {
