@@ -228,7 +228,7 @@ func (g *game) dealDamageByCoords(damageAmount int, targetCoords *playerZoneCoor
 	}
 	if targetUnit != nil {
 		finalDmg := damageAmount - targetArmor
-		g.messageForPlayer += fmt.Sprintf("%s receives %d damage.", targetUnit.getName(), finalDmg)
+		g.messageForPlayer += fmt.Sprintf("%s receives %d damage. \n ", targetUnit.getName(), finalDmg)
 		targetUnit.wounds += finalDmg
 	}
 }

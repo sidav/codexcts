@@ -98,6 +98,23 @@ func (ai *aiPlayerController) tryAddWorker(g *game) bool {
 	}
 }
 
+func (ai *aiPlayerController) tryPlayMagicCard(g *game) bool {
+	plr := ai.controlsPlayer
+	var cardToPlay card
+	for _, c := range plr.hand {
+		if _, isMagic := c.(*magicCard); isMagic {
+			cardToPlay = c
+		}
+	}
+	if cardToPlay != nil {
+		log.Printf("I played magic %s from my hand.\n", cardToPlay.getName())
+		return g.tryPlayMagicCardFromHand(cardToPlay)
+	} else {
+		log.Printf("I found no magic cards from my hand to play.\n")
+		return false
+	}
+}
+
 func (ai *aiPlayerController) tryPlayUnit(g *game) bool {
 	// ai.logHand()
 	plr := ai.controlsPlayer

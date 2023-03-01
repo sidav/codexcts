@@ -18,6 +18,14 @@ func (g *game) tryPlayMagicCardFromHand(c card) bool {
 		return false
 	}
 	spl := c.(*magicCard).triggersSpell
+	if spl == nil {
+		g.messageForPlayer += c.getName() + " card is not yet implemented. \n "
+		for _, contr := range g.playersControllers {
+			contr.showMessage("NOT IMPLEMENTED", g.messageForPlayer)
+		}
+		return false // fail-safe
+	}
+
 	coords := g.getTargetableCoordsForSpell(g.currentPlayer, spl)
 	if len(coords) == 0 {
 		return false

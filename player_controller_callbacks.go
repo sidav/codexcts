@@ -16,7 +16,7 @@ func (pc *playerController) selectCoordsFromListCallback(message string, coords 
 	for {
 		key := readKey()
 		index := strings.Index(coordsSelectableWithCallback, key)
-		if index != -1 {
+		if index != -1 && index < len(coords) {
 			pc.currentMode = previousMode
 			return coords[index]
 		}

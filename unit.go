@@ -41,6 +41,7 @@ func (u *unit) getAtkHpWithWounds() (int, int) {
 		for i := len(hc.levelsAttDef) - 1; i >= 0; i-- {
 			if u.level >= hc.levelsAttDef[i][0] {
 				atk, hp = hc.levelsAttDef[i][1], hc.levelsAttDef[i][2]
+				break
 			}
 		}
 	}

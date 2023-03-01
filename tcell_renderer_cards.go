@@ -77,7 +77,7 @@ func (r *tcellRenderer) renderCardFull(c card, x, y, w, h int) {
 	case *heroCard:
 		elementAndTechLine += " Hero"
 		hc := c.(*heroCard)
-		levelsStr := fmt.Sprintf("LEVELS 1-%d: %d/%d \n ", hc.levelsAttDef[1][0]-1, hc.levelsAttDef[1][1], hc.levelsAttDef[1][2])
+		levelsStr := fmt.Sprintf("LEVELS 1-%d: %d/%d \n ", hc.levelsAttDef[1][0]-1, hc.levelsAttDef[0][1], hc.levelsAttDef[0][2])
 		levelsStr += hc.levelsAbilitiesTexts[0] + " \n "
 		for i := 1; i < len(hc.levelsAttDef)-1; i++ {
 			levelsStr += fmt.Sprintf("LEVELS %d-%d: %d/%d \n ", hc.levelsAttDef[i][0], hc.levelsAttDef[i+1][0]-1,

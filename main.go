@@ -54,7 +54,8 @@ func main() {
 	})
 	g.players[1].name = "AI - Player 2"
 
-	// debug units
+	// debug
+	// g.players[0].gold += 200
 	//g.players[0].otherZone = append(g.players[0].otherZone, &unit{
 	//	card: getCardByName("Eggship"),
 	//})
