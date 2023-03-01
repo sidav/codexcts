@@ -62,23 +62,18 @@ func (ai *aiPlayerController) tryAddWorker(g *game) bool {
 		return false
 	}
 
-	// TODO: change when the AI will be able to cast spells
-	hasCardsWhichAiCantPlay := false
-	for _, c := range plr.hand {
-		if _, ok := c.(*magicCard); ok {
-			hasCardsWhichAiCantPlay = true
-			break
-		}
-	}
-
-	if !hasCardsWhichAiCantPlay && plr.workers >= 10 && rnd.Rand(plr.workers*3) > 0 {
+	if plr.workers >= 10 && rnd.Rand(plr.workers*3) > 0 {
 		return false
 	}
 
 	index := rnd.SelectRandomIndexFromWeighted(len(plr.hand), func(i int) int {
 		switch plr.hand[i].(type) {
 		case *magicCard:
-			return 100 // TODO: change when the AI will be able to cast spells
+			if g.canPlayerPlayCard(plr, plr.hand[i]) {
+				return 5
+			} else {
+				return 10 // Unplayable by AI == unimplemented?
+			}
 		case *unitCard:
 			if g.canPlayerPlayCard(plr, plr.hand[i]) {
 				return 5 // playable cards are non-tech-dependent, so not important?
