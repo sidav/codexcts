@@ -103,6 +103,9 @@ func (ai *aiPlayerController) tryPlayUnit(g *game) bool {
 	plr := ai.controlsPlayer
 	var cardToPlay card
 	for _, c := range plr.hand {
+		if _, isMagic := c.(*magicCard); isMagic {
+			continue
+		}
 		if g.canPlayerPlayCard(plr, c) && (cardToPlay == nil || rnd.OneChanceFrom(3)) {
 			cardToPlay = c
 		}

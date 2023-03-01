@@ -13,6 +13,30 @@ func (g *game) tryPlayCardAsWorker(c card) bool {
 	return false
 }
 
+func (g *game) tryPlayMagicCardFromHand(c card) bool {
+	if !g.canPlayerPlayCard(g.currentPlayer, c) {
+		return false
+	}
+	spl := c.(*magicCard).triggersSpell
+	coords := g.getTargetableCoordsForSpell(g.currentPlayer, spl)
+	if len(coords) == 0 {
+		return false
+	}
+	var selectedCoords *playerZoneCoords
+	if len(coords) == 1 {
+		selectedCoords = coords[0]
+	} else {
+		selectedCoords = g.playersControllers[g.currentPlayerNumber].selectCoordsFromListCallback(
+			"Select spell target", coords)
+	}
+	g.messageForPlayer = fmt.Sprintf("%s casts %s! \n ", g.currentPlayer.name, c.getName())
+	g.putSpellInEffect(g.currentPlayer, spl, selectedCoords)
+	g.currentPlayer.discard.addToBottom(c)
+	g.currentPlayer.hand.removeThis(c)
+	g.playersControllers[g.currentPlayerNumber].showMessage("SPELL", g.messageForPlayer)
+	return true
+}
+
 func (g *game) tryPlayUnitCardFromHand(c card) bool {
 	if g.canPlayerPlayCard(g.currentPlayer, c) {
 		unt := &unit{

@@ -4,11 +4,12 @@ import "fmt"
 
 // unit is "card on the battlefield", as opposed to "card in deck"
 type unit struct {
-	card             card
-	tapped           bool // "exhausted" in rules
-	attackedThisTurn bool // for units with Readiness, "tapped" is not enough
-	wounds           int
-	level            int // needed only for heroes
+	card              card
+	tapped            bool // "exhausted" in rules
+	attackedThisTurn  bool // for units with Readiness, "tapped" is not enough
+	wounds            int
+	level             int // needed only for heroes
+	atkRunes, hpRunes int // +1/+1 runes or whatever
 }
 
 func (u *unit) getName() string {
@@ -25,19 +26,25 @@ func (u *unit) isHero() bool {
 	return ok
 }
 
+func (u *unit) receiveRune(atk, hp int) {
+	u.atkRunes += atk
+	u.hpRunes += hp
+}
+
 func (u *unit) getAtkHpWithWounds() (int, int) {
+	atk, hp := -99, -99
 	switch u.card.(type) {
 	case *unitCard:
-		return u.card.(*unitCard).baseAtk, u.card.(*unitCard).baseHP - u.wounds
+		atk, hp = u.card.(*unitCard).baseAtk, u.card.(*unitCard).baseHP
 	case *heroCard:
 		hc := u.card.(*heroCard)
 		for i := len(hc.levelsAttDef) - 1; i >= 0; i-- {
 			if u.level >= hc.levelsAttDef[i][0] {
-				return hc.levelsAttDef[i][1], hc.levelsAttDef[i][2] - u.wounds
+				atk, hp = hc.levelsAttDef[i][1], hc.levelsAttDef[i][2]
 			}
 		}
 	}
-	return -99, -99
+	return atk + u.atkRunes, hp + u.hpRunes - u.wounds
 }
 
 func (u *unit) hasPassiveAbility(code UPACode) bool {

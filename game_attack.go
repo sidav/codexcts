@@ -179,3 +179,56 @@ func (g *game) removeDeadUnits() {
 		}
 	}
 }
+
+func (g *game) dealDamageByCoords(damageAmount int, targetCoords *playerZoneCoords) {
+	targetPlayer := targetCoords.player
+	targetIndex := targetCoords.indexInZone
+	targetArmor := 0
+	var targetUnit *unit
+	switch targetCoords.zone {
+	case PLAYERZONE_MAIN_BASE:
+		targetCoords.player.baseHealth -= damageAmount
+		g.messageForPlayer += fmt.Sprintf("%s's base took %d damage. (%d HP remaining)\n ", targetCoords.player.name,
+			damageAmount, targetCoords.player.baseHealth)
+	case PLAYERZONE_TECH_BUILDINGS:
+		targetPlayer.techBuildings[targetIndex].currentHitpoints -= damageAmount
+		g.messageForPlayer += fmt.Sprintf("%s's %s took %d damage (%d HP remaining). \n ", targetPlayer.name,
+			targetPlayer.techBuildings[targetIndex].static.name, damageAmount, targetPlayer.techBuildings[targetIndex].currentHitpoints)
+		if targetPlayer.techBuildings[targetIndex].currentHitpoints <= 0 {
+			targetPlayer.baseHealth -= 2
+			g.messageForPlayer += fmt.Sprintf(" It's destroyed! %s's base took 2 damage (%d HP remaining). \n ",
+				targetPlayer.name, targetPlayer.baseHealth)
+			targetPlayer.techBuildings[targetIndex] = nil // TODO: rebuildability
+		}
+	case PLAYERZONE_ADDON_BUILDING:
+		targetPlayer.addonBuilding.currentHitpoints -= damageAmount
+		g.messageForPlayer += fmt.Sprintf("%s's %s took %d damage (%d HP remaining). \n ", targetPlayer.name,
+			targetPlayer.addonBuilding.static.name, damageAmount, targetPlayer.addonBuilding.currentHitpoints)
+		if targetPlayer.addonBuilding.currentHitpoints <= 0 {
+			targetPlayer.baseHealth -= 2
+			g.messageForPlayer += fmt.Sprintf(" It's destroyed! %s's base took 2 damage (%d HP remaining). \n ",
+				targetPlayer.name, targetPlayer.baseHealth)
+			targetPlayer.addonBuilding = nil
+		}
+	case PLAYERZONE_OTHER:
+		targetUnit = targetPlayer.otherZone[targetIndex]
+	case PLAYERZONE_PATROL:
+		targetUnit = targetPlayer.patrolZone[targetIndex]
+		if targetIndex == 0 {
+			if targetPlayer.patrolLeaderHasShield {
+				g.messageForPlayer += fmt.Sprintf("%s's %s is in leader slot, thus getting 1 armor. \n ",
+					targetPlayer.name,
+					targetUnit.getName())
+				targetArmor++
+				targetPlayer.patrolLeaderHasShield = false
+			} else {
+				g.messageForPlayer += "Defender has already spent its shield from patrol position. \n "
+			}
+		}
+	}
+	if targetUnit != nil {
+		finalDmg := damageAmount - targetArmor
+		g.messageForPlayer += fmt.Sprintf("%s receives %d damage.", targetUnit.getName(), finalDmg)
+		targetUnit.wounds += finalDmg
+	}
+}

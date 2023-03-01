@@ -124,6 +124,11 @@ func (pc *playerController) mainPhase(g *game) {
 					pc.currentMode = PCMODE_NONE
 					pc.currentSelectedCardFromHand = nil
 				}
+			case *magicCard:
+				if g.tryPlayMagicCardFromHand(pc.currentSelectedCardFromHand) {
+					pc.currentMode = PCMODE_NONE
+					pc.currentSelectedCardFromHand = nil
+				}
 			}
 		}
 	case PCMODE_UNIT_SELECTED:

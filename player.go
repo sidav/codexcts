@@ -66,6 +66,20 @@ func (p *player) getUnitsInAllActiveZones() (units []*unit) {
 	return
 }
 
+func (p *player) hasHeroOnField() bool {
+	for _, u := range p.otherZone {
+		if u.isHero() {
+			return true
+		}
+	}
+	for _, u := range p.patrolZone {
+		if u != nil && u.isHero() {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *player) countUnitsInPatrolZone() int {
 	sum := 0
 	for _, u := range p.patrolZone {
@@ -74,6 +88,16 @@ func (p *player) countUnitsInPatrolZone() int {
 		}
 	}
 	return sum
+}
+
+func (p *player) getUnitByCoords(coords *playerZoneCoords) *unit {
+	switch coords.zone {
+	case PLAYERZONE_OTHER:
+		return p.otherZone[coords.indexInZone]
+	case PLAYERZONE_PATROL:
+		return p.patrolZone[coords.indexInZone]
+	}
+	panic("Strange coords given!")
 }
 
 func (p *player) countUntappedUnitsInPatrolZone() int {

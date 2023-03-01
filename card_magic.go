@@ -3,15 +3,16 @@ package main
 import "fmt"
 
 type magicCard struct {
-	cost         int
-	name         string
-	subtype      string // buff, debuff, etc
-	isMinor      bool
-	isUltimate   bool
-	isOngoing    bool
-	description  string
-	element      element
-	startingDeck bool
+	cost          int
+	name          string
+	subtype       string // buff, debuff, etc
+	isMinor       bool
+	isUltimate    bool
+	isOngoing     bool
+	description   string
+	element       element
+	startingDeck  bool
+	triggersSpell *spell
 }
 
 func (mc *magicCard) getName() string {

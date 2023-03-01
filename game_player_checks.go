@@ -8,7 +8,8 @@ func (g *game) canPlayerPlayCard(p *player, c card) bool {
 	var can bool
 	switch c.(type) {
 	case *magicCard:
-		can = false // TODO: check for hero presence etc
+		can = p.hasHeroOnField()
+		// TODO: hero color checks for increased cost
 	case *unitCard:
 		can = p.hasTechLevel(c.(*unitCard).techLevel)
 	case *heroCard:
