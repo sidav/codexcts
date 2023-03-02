@@ -35,24 +35,10 @@ func main() {
 	g.initGame()
 
 	if len(os.Args) > 1 && os.Args[1] == "aivsai" {
-		g.players[0].name = "Player 1"
-		g.playersControllers = append(g.playersControllers, &aiPlayerController{
-			controlsPlayer: g.players[0],
-		})
+		setupGame(g, true)
 	} else {
-		g.players[0].name = "Player"
-		g.playersControllers = append(g.playersControllers, &playerController{
-			controlsPlayer:              g.players[0],
-			currentMode:                 PCMODE_NONE,
-			currentSelectedCardFromHand: nil,
-			currentSelectedUnit:         nil,
-		})
+		setupGame(g, false)
 	}
-
-	g.playersControllers = append(g.playersControllers, &aiPlayerController{
-		controlsPlayer: g.players[1],
-	})
-	g.players[1].name = "AI - Player 2"
 
 	// debug
 	// g.players[0].gold += 200
@@ -70,4 +56,61 @@ func main() {
 	//}
 
 	gameLoop(g)
+}
+
+func setupGame(g *game, aivsai bool) {
+	if rnd.OneChanceFrom(2) {
+		g.players[0].commandZone[0] = heroCardsDb[1]
+		g.players[1].commandZone[0] = heroCardsDb[0]
+	} else {
+		g.players[0].commandZone[0] = heroCardsDb[0]
+		g.players[1].commandZone[0] = heroCardsDb[1]
+	}
+	g.initPlayerCodices()
+	
+	if aivsai {
+		g.players[0].name = "AI 1"
+		g.playersControllers = append(g.playersControllers, &aiPlayerController{
+			controlsPlayer: g.players[0],
+		})
+		g.players[1].name = "AI 2"
+		g.playersControllers = append(g.playersControllers, &aiPlayerController{
+			controlsPlayer: g.players[1],
+		})
+		return
+	}
+
+	playerFirst := rnd.OneChanceFrom(2)
+	if playerFirst {
+		g.messageForPlayer = "You play first. \n"
+		g.messageForPlayer += fmt.Sprintf("Your starting hero is %s. \n ", g.players[0].commandZone[0].getName())
+		g.players[0].name = "Player"
+		g.playersControllers = append(g.playersControllers, &playerController{
+			controlsPlayer:              g.players[0],
+			currentMode:                 PCMODE_NONE,
+			currentSelectedCardFromHand: nil,
+			currentSelectedUnit:         nil,
+		})
+
+		g.players[1].name = "AI"
+		g.playersControllers = append(g.playersControllers, &aiPlayerController{
+			controlsPlayer: g.players[1],
+		})
+	} else {
+		g.players[0].name = "AI"
+		g.playersControllers = append(g.playersControllers, &aiPlayerController{
+			controlsPlayer: g.players[0],
+		})
+
+		g.messageForPlayer = "You play second. \n "
+		g.messageForPlayer += fmt.Sprintf("Your starting hero is %s. \n ", g.players[1].commandZone[0].getName())
+		g.players[1].name = "Player"
+		g.playersControllers = append(g.playersControllers, &playerController{
+			controlsPlayer:              g.players[1],
+			currentMode:                 PCMODE_NONE,
+			currentSelectedCardFromHand: nil,
+			currentSelectedUnit:         nil,
+		})
+	}
+	g.showMessageToAllPlayers("GAME START")
 }

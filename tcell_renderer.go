@@ -23,13 +23,17 @@ type tcellRenderer struct {
 	pc           *playerController
 }
 
+func (r *tcellRenderer) updateBounds() {
+	r.w, r.h = cw.GetConsoleSize()
+	cw.ClearScreen()
+}
+
 func (r *tcellRenderer) renderGame(g *game, renderForPlayerNum int, pc *playerController) {
+	r.updateBounds()
 	r.pc = pc
 	r.g = g
 	r.activePlayer = g.players[renderForPlayerNum]
 	r.enemy = g.players[(renderForPlayerNum+1)%2]
-	r.w, r.h = cw.GetConsoleSize()
-	cw.ClearScreen()
 
 	r.renderHeader()
 	r.renderEnemyField()

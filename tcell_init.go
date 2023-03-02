@@ -11,6 +11,7 @@ func onInit() {
 	cw = &tcell_console_wrapper.ConsoleWrapper{}
 	cw.Init()
 	io = &tcellRenderer{}
+	io.updateBounds()
 }
 
 func onClose() {
