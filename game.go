@@ -1,6 +1,8 @@
 package main
 
-import "log"
+import (
+	"fmt"
+)
 
 type game struct {
 	players            [2]*player
@@ -73,7 +75,8 @@ func (g *game) endCurrentPhase() {
 	}
 
 	if g.currentPlayer.baseHealth <= 0 {
-		log.Printf("%s wins on turn %d! \n", g.getEnemyForPlayer(g.currentPlayer).name, g.currentTurn)
+		g.messageForPlayer = fmt.Sprintf("%s wins on turn %d! \n", g.getEnemyForPlayer(g.currentPlayer).name, g.currentTurn)
+		g.showMessageToAllPlayers("GAME ENDS")
 		exitGame = true
 	}
 

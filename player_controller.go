@@ -51,7 +51,6 @@ func (pc *playerController) phaseEnded() bool {
 }
 
 func (pc *playerController) act(g *game) {
-	pc.g = g
 	pc.endPhase = false
 	io.renderGame(g, g.currentPlayerNumber, pc)
 	switch g.currentPhase {

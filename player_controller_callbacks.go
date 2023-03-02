@@ -24,6 +24,7 @@ func (pc *playerController) selectCoordsFromListCallback(message string, coords 
 }
 
 func (pc *playerController) showMessage(title, msg string) {
+	io.renderGame(pc.g, pc.g.getPlayerNumber(pc.controlsPlayer), pc)
 	io.showMessageWindow(title, msg, tcell.ColorRed)
 	for readKey() != "ENTER" {
 	}

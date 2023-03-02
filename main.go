@@ -67,7 +67,7 @@ func setupGame(g *game, aivsai bool) {
 		g.players[1].commandZone[0] = heroCardsDb[1]
 	}
 	g.initPlayerCodices()
-	
+
 	if aivsai {
 		g.players[0].name = "AI 1"
 		g.playersControllers = append(g.playersControllers, &aiPlayerController{
@@ -86,6 +86,7 @@ func setupGame(g *game, aivsai bool) {
 		g.messageForPlayer += fmt.Sprintf("Your starting hero is %s. \n ", g.players[0].commandZone[0].getName())
 		g.players[0].name = "Player"
 		g.playersControllers = append(g.playersControllers, &playerController{
+			g:                           g,
 			controlsPlayer:              g.players[0],
 			currentMode:                 PCMODE_NONE,
 			currentSelectedCardFromHand: nil,
@@ -106,6 +107,7 @@ func setupGame(g *game, aivsai bool) {
 		g.messageForPlayer += fmt.Sprintf("Your starting hero is %s. \n ", g.players[1].commandZone[0].getName())
 		g.players[1].name = "Player"
 		g.playersControllers = append(g.playersControllers, &playerController{
+			g:                           g,
 			controlsPlayer:              g.players[1],
 			currentMode:                 PCMODE_NONE,
 			currentSelectedCardFromHand: nil,

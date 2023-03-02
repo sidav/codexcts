@@ -3,10 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
+	"strings"
 )
 
 func (r *tcellRenderer) showMessageWindow(title string, msg string, color tcell.Color) {
-	ww, wh := r.w/2, 5*r.h/6
+	ww := r.w / 2
+	wh := len(msg)/ww + strings.Count(msg, "\n")
+	if wh < 3 {
+		wh = 3
+	}
 	wx, wy := r.w/2-ww/2, r.h/2-wh/2
 	r.drawWindow(title, wx, wy, ww, wh, color)
 	cw.ResetStyle()
