@@ -36,9 +36,9 @@ func (ai *aiPlayerController) act(g *game) {
 
 func (ai *aiPlayerController) actMain(g *game) {
 	plr := ai.controlsPlayer
-	const economicActionsPerTurn = 7
 	// first, play random card from hand as a worker
 	ai.tryAddWorker(g)
+	const economicActionsPerTurn = 7
 	performedEconomicActions := 0
 	for performedEconomicActions < economicActionsPerTurn {
 		if ai.tryPerformRandomEconomicAction(g) {

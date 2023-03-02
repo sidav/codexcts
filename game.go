@@ -204,3 +204,9 @@ func (g *game) getEnemyForPlayer(p *player) *player {
 	}
 	panic("Waaat")
 }
+
+func (g *game) showMessageToAllPlayers(title string) {
+	for _, contr := range g.playersControllers {
+		contr.showMessage(title, g.messageForPlayer)
+	}
+}

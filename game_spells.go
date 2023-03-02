@@ -19,7 +19,7 @@ func (g *game) putSpellInEffect(owner *player, s *spell, targetCoords *playerZon
 		if s.effectValue1 >= 0 {
 			r2Text = "+" + r2Text
 		}
-		g.messageForPlayer += fmt.Sprintf("%s receives %s/%s rune.", targUnt.getName(), r1Text, r2Text)
+		g.messageForPlayer += fmt.Sprintf("%s receives %s/%s rune. \n ", targUnt.getName(), r1Text, r2Text)
 		targUnt.receiveRune(s.effectValue1, s.effectValue2)
 	}
 	g.removeDeadUnits()

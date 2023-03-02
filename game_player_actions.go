@@ -19,10 +19,8 @@ func (g *game) tryPlayMagicCardFromHand(c card) bool {
 	}
 	spl := c.(*magicCard).triggersSpell
 	if spl == nil {
-		g.messageForPlayer += c.getName() + " card is not yet implemented. \n "
-		for _, contr := range g.playersControllers {
-			contr.showMessage("NOT IMPLEMENTED", g.messageForPlayer)
-		}
+		g.messageForPlayer = c.getName() + " card is not yet implemented. \n "
+		g.showMessageToAllPlayers("NOT IMPLEMENTED")
 		return false // fail-safe
 	}
 
@@ -37,11 +35,11 @@ func (g *game) tryPlayMagicCardFromHand(c card) bool {
 		selectedCoords = g.playersControllers[g.currentPlayerNumber].selectCoordsFromListCallback(
 			"Select spell target", coords)
 	}
-	g.messageForPlayer = fmt.Sprintf("%s casts %s! \n ", g.currentPlayer.name, c.getName())
+	g.messageForPlayer = fmt.Sprintf("%s casts %s on %s! \n ", g.currentPlayer.name, c.getName(), selectedCoords.getFormattedName())
 	g.putSpellInEffect(g.currentPlayer, spl, selectedCoords)
 	g.currentPlayer.discard.addToBottom(c)
 	g.currentPlayer.hand.removeThis(c)
-	g.playersControllers[g.currentPlayerNumber].showMessage("SPELL", g.messageForPlayer)
+	g.showMessageToAllPlayers("SPELL")
 	return true
 }
 
@@ -156,9 +154,7 @@ func (g *game) tryAttackAsUnit(owner *player, attacker *unit) bool {
 		attacker.tapped = true
 	}
 	attacker.attackedThisTurn = true
-	for _, contr := range g.playersControllers {
-		contr.showMessage("COMBAT", g.messageForPlayer)
-	}
+	g.showMessageToAllPlayers("COMBAT")
 	return true
 }
 
