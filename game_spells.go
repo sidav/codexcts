@@ -36,6 +36,28 @@ func (g *game) getTargetableCoordsForSpell(owner *player, s *spell) []*playerZon
 		}
 		for _, z := range s.targetableZones {
 			switch z {
+			case PLAYERZONE_MAIN_BASE:
+				list = append(list, &playerZoneCoords{
+					player: currPlayer,
+					zone:   PLAYERZONE_MAIN_BASE,
+				})
+			case PLAYERZONE_TECH_BUILDINGS:
+				for i, tb := range currPlayer.techBuildings {
+					if tb != nil {
+						list = append(list, &playerZoneCoords{
+							player:      currPlayer,
+							zone:        PLAYERZONE_TECH_BUILDINGS,
+							indexInZone: i,
+						})
+					}
+				}
+			case PLAYERZONE_ADDON_BUILDING:
+				if currPlayer.addonBuilding != nil {
+					list = append(list, &playerZoneCoords{
+						player: currPlayer,
+						zone:   PLAYERZONE_ADDON_BUILDING,
+					})
+				}
 			case PLAYERZONE_OTHER:
 				for i, unt := range currPlayer.otherZone {
 					if g.canSpellTargetUnit(s, unt) {

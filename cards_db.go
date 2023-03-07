@@ -158,12 +158,22 @@ var cardsDb = []card{
 	},
 	// BASHING DECK
 	&magicCard{
-		cost:         0,
-		name:         "Wrecking Ball",
-		subtype:      "",
-		description:  "Deal 2 damage to a building",
-		element:      ELEMENT_BASHING,
-		startingDeck: true,
+		cost:        0,
+		name:        "Wrecking Ball",
+		subtype:     "",
+		description: "Deal 2 damage to a building",
+		element:     ELEMENT_BASHING,
+		triggersSpell: &spell{
+			isContinious:     false,
+			targetsNumber:    1,
+			targetsAllInZone: false,
+			canTargetUnits:   false,
+			canTargetHeroes:  false,
+			canTargetEnemy:   true,
+			targetableZones:  []int{PLAYERZONE_MAIN_BASE, PLAYERZONE_TECH_BUILDINGS, PLAYERZONE_ADDON_BUILDING},
+			effectCode:       SPELL_DEAL_DAMAGE,
+			effectValue1:     2,
+		},
 	},
 	&magicCard{
 		cost:        0,
